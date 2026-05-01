@@ -1,7 +1,7 @@
 const { useState, useEffect, useMemo } = React;
 
 /* ======================
-   STORAGE
+   STORAGE RESULTS (SERIES)
 ====================== */
 
 function loadResults() {
@@ -13,6 +13,27 @@ function saveResults(data) {
 }
 
 /* ======================
+   STORAGE MATCHES (RAW API)
+====================== */
+
+function loadMatches() {
+    return JSON.parse(localStorage.getItem("nba_matches") || "{}");
+}
+
+function saveMatches(data, setRawMatches) {
+
+    const existing = loadMatches();
+
+    const merged = {
+        ...existing,
+        ...data
+    };
+
+    localStorage.setItem("nba_matches", JSON.stringify(merged));
+    setRawMatches(merged);
+}
+
+/* ======================
    APP
 ====================== */
 
@@ -21,8 +42,9 @@ function App() {
     const [tab, setTab] = useState("series");
 
     const [pronos, setPronos] = useState([]);
-
     const [results, setResults] = useState(loadResults());
+    const [rawMatches, setRawMatches] = useState(loadMatches());
+
     const [loading, setLoading] = useState(false);
 
     /* ======================
@@ -37,7 +59,7 @@ function App() {
     }, []);
 
     /* ======================
-       SAVE RESULTS
+       SAVE SERIES RESULTS
     ====================== */
 
     useEffect(() => {
@@ -45,7 +67,7 @@ function App() {
     }, [results]);
 
     /* ======================
-       FETCH MATCHS
+       FETCH MATCHS (3 DAYS CHUNKS)
     ====================== */
 
     const fetchResults = async () => {
@@ -75,10 +97,7 @@ function App() {
 
             });
 
-            setResults(prev => ({
-                ...prev,
-                ...newResults
-            }));
+            saveMatches(newResults, setRawMatches);
 
         } catch (e) {
             console.error("FETCH ERROR:", e);
@@ -88,7 +107,7 @@ function App() {
     };
 
     /* ======================
-       POINTS
+       POINTS CALCULATION
     ====================== */
 
     const calculatePoints = (prono, real) => {
@@ -107,7 +126,7 @@ function App() {
     };
 
     /* ======================
-       MATCHES FIXES
+       MATCH IDS (SERIES VIEW)
     ====================== */
 
     const matches = [
@@ -129,7 +148,12 @@ function App() {
 
             t[j] = pronos
                 .filter(p => p.joueur === j)
-                .reduce((sum, p) => sum + calculatePoints(p, results[p.match_id]), 0);
+                .reduce((sum, p) => {
+
+                    const real = results[p.match_id];
+                    return sum + calculatePoints(p, real);
+
+                }, 0);
 
         });
 
@@ -148,7 +172,7 @@ function App() {
             <h1>NBA PLAYOFFS 2026</h1>
 
             <button onClick={fetchResults}>
-                {loading ? "Loading..." : "Fetch"}
+                {loading ? "Loading..." : "Fetch 3 jours"}
             </button>
 
             {/* ======================
@@ -172,7 +196,7 @@ function App() {
             </div>
 
             {/* ======================
-               TAB PRONOS
+               PRONOS TAB
             ====================== */}
 
             {tab === "pronos" && (
@@ -182,17 +206,27 @@ function App() {
             )}
 
             {/* ======================
-               TAB RAW RESULTS
+               RAW MATCHES TAB
             ====================== */}
 
             {tab === "raw" && (
-                <pre style={{ background: "black", color: "cyan", padding: 10 }}>
-                    {JSON.stringify(results, null, 2)}
-                </pre>
+                <div>
+
+                    <h3>Matchs stockés (localStorage)</h3>
+
+                    <pre style={{
+                        background: "black",
+                        color: "cyan",
+                        padding: 10
+                    }}>
+                        {JSON.stringify(rawMatches, null, 2)}
+                    </pre>
+
+                </div>
             )}
 
             {/* ======================
-               TAB SERIES
+               SERIES TAB
             ====================== */}
 
             {tab === "series" && (
@@ -218,7 +252,7 @@ function App() {
 
                             {matches.map(id => {
 
-                                const real = results[id] || {};
+                                const real = rawMatches[id] || {};
 
                                 return (
                                     <tr key={id}>
@@ -273,4 +307,4 @@ function App() {
 
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />); 
