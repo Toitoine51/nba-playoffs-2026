@@ -1,4 +1,3 @@
-document.body.innerHTML = "APP JS CHARGE";
 
 const { useState, useEffect, useMemo } = React;
 
