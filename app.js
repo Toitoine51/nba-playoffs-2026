@@ -1,4 +1,3 @@
-
 const { useState, useEffect, useMemo } = React;
 
 /* ======================
@@ -19,30 +18,27 @@ function saveResults(data) {
 
 function App() {
 
-    /* ======================
-       PRONOS
-    ====================== */
+    const [tab, setTab] = useState("series");
 
     const [pronos, setPronos] = useState([]);
+
+    const [results, setResults] = useState(loadResults());
+    const [loading, setLoading] = useState(false);
+
+    /* ======================
+       LOAD PRONOS
+    ====================== */
 
     useEffect(() => {
         fetch("./pronos.json")
             .then(r => r.json())
-            .then(data => {
-                setPronos(data);
-            })
-            .catch(err => {
-                document.body.innerHTML +=
-                    "<div style='color:red'>ERREUR PRONOS: " + err + "</div>";
-            });
+            .then(data => setPronos(data))
+            .catch(err => console.error("PRONOS ERROR:", err));
     }, []);
 
     /* ======================
-       RESULTS
+       SAVE RESULTS
     ====================== */
-
-    const [results, setResults] = useState(loadResults());
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         saveResults(results);
@@ -61,11 +57,8 @@ function App() {
             const res = await fetch(
                 "https://scrap.toitoine51.workers.dev/?start=20260414&days=3"
             );
-           alert("FETCH OK");
 
             const json = await res.json();
-            alert("JSON OK");
-            alert(JSON.stringify(json.events?.[0], null, 2));
 
             const newResults = {};
 
@@ -82,17 +75,13 @@ function App() {
 
             });
 
-            const updated = {
-                ...results,
+            setResults(prev => ({
+                ...prev,
                 ...newResults
-            };
-
-            setResults(updated);
+            }));
 
         } catch (e) {
-
-            document.body.innerHTML +=
-                "<div style='color:red'>FETCH ERROR: " + e + "</div>";
+            console.error("FETCH ERROR:", e);
         }
 
         setLoading(false);
@@ -105,45 +94,28 @@ function App() {
     const calculatePoints = (prono, real) => {
 
         if (!real) return 0;
-
         if (real.status !== "Final") return 0;
 
         let pts = 0;
 
         if (prono.gagnant === real.winner) {
-
             pts += 10;
-
-            if (prono.score === real.score) {
-                pts += 10;
-            }
+            if (prono.score === real.score) pts += 10;
         }
 
         return pts;
     };
 
     /* ======================
-       MATCHES
+       MATCHES FIXES
     ====================== */
 
     const matches = [
-        "R1-O1",
-        "R1-O2",
-        "R1-O3",
-        "R1-O4",
-        "R1-E1",
-        "R1-E2",
-        "R1-E3",
-        "R1-E4"
+        "R1-O1","R1-O2","R1-O3","R1-O4",
+        "R1-E1","R1-E2","R1-E3","R1-E4"
     ];
 
-    const joueurs = [
-        "Guilhem",
-        "Ousset",
-        "Jeff",
-        "Daude",
-        "Antoine"
-    ];
+    const joueurs = ["Guilhem","Ousset","Jeff","Daude","Antoine"];
 
     /* ======================
        TOTALS
@@ -157,14 +129,7 @@ function App() {
 
             t[j] = pronos
                 .filter(p => p.joueur === j)
-                .reduce((sum, p) => {
-
-                    return sum + calculatePoints(
-                        p,
-                        results[p.match_id]
-                    );
-
-                }, 0);
+                .reduce((sum, p) => sum + calculatePoints(p, results[p.match_id]), 0);
 
         });
 
@@ -178,209 +143,134 @@ function App() {
 
     return (
 
-        <div style={{
-            padding: 10,
-            fontFamily: "Arial",
-            background: "#f5f5f5",
-            minHeight: "100vh"
-        }}>
+        <div style={{ padding: 10, fontFamily: "Arial" }}>
 
-            <h1 style={{
-                background: "#1d428a",
-                color: "white",
-                padding: 15,
-                margin: 0,
-                marginBottom: 10
-            }}>
-                NBA PLAYOFFS 2026
-            </h1>
+            <h1>NBA PLAYOFFS 2026</h1>
 
-            <button
-                onClick={fetchResults}
-                style={{
-                    background: "#c8102e",
-                    color: "white",
-                    border: "none",
-                    padding: 12,
-                    borderRadius: 6,
-                    marginBottom: 15,
-                    fontWeight: "bold"
-                }}
-            >
+            <button onClick={fetchResults}>
                 {loading ? "Loading..." : "Fetch"}
             </button>
 
-            <div style={{
-                marginBottom: 10,
-                background: "black",
-                color: "lime",
-                padding: 10,
-                fontSize: 11
-            }}>
-                PRONOS: {pronos.length}
+            {/* ======================
+               TABS
+            ====================== */}
+
+            <div style={{ display: "flex", gap: 10, marginTop: 10, marginBottom: 10 }}>
+
+                <button onClick={() => setTab("pronos")}>
+                    Pronostics
+                </button>
+
+                <button onClick={() => setTab("raw")}>
+                    Résultats bruts
+                </button>
+
+                <button onClick={() => setTab("series")}>
+                    Séries
+                </button>
+
             </div>
 
-            <div style={{
-                overflowX: "auto"
-            }}>
+            {/* ======================
+               TAB PRONOS
+            ====================== */}
 
-                <table style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    background: "white",
-                    minWidth: "900px"
-                }}>
+            {tab === "pronos" && (
+                <pre style={{ background: "black", color: "lime", padding: 10 }}>
+                    {JSON.stringify(pronos, null, 2)}
+                </pre>
+            )}
 
-                    <thead>
+            {/* ======================
+               TAB RAW RESULTS
+            ====================== */}
 
-                        <tr style={{
-                            background: "#1d428a",
-                            color: "white"
-                        }}>
+            {tab === "raw" && (
+                <pre style={{ background: "black", color: "cyan", padding: 10 }}>
+                    {JSON.stringify(results, null, 2)}
+                </pre>
+            )}
 
-                            <th style={{ padding: 10 }}>
-                                Match
-                            </th>
+            {/* ======================
+               TAB SERIES
+            ====================== */}
 
-                            <th style={{ padding: 10 }}>
-                                Score
-                            </th>
+            {tab === "series" && (
 
-                            {joueurs.map(j => (
+                <div style={{ overflowX: "auto" }}>
 
-                                <th
-                                    key={j}
-                                    style={{ padding: 10 }}
-                                >
-                                    <div>{j}</div>
+                    <table border="1" cellPadding="5">
 
-                                    <div style={{
-                                        color: "#ffd54f",
-                                        fontWeight: "bold",
-                                        fontSize: 20
-                                    }}>
+                        <thead>
+                            <tr>
+                                <th>Match</th>
+                                <th>Score</th>
+                                {joueurs.map(j => (
+                                    <th key={j}>
+                                        {j}<br/>
                                         {totals[j]}
-                                    </div>
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
 
-                                </th>
+                        <tbody>
 
-                            ))}
+                            {matches.map(id => {
 
-                        </tr>
+                                const real = results[id] || {};
 
-                    </thead>
+                                return (
+                                    <tr key={id}>
 
-                    <tbody>
+                                        <td>
+                                            {id}<br/>
+                                            {real.teamA} vs {real.teamB}<br/>
+                                            {real.status}
+                                        </td>
 
-                        {matches.map(id => {
+                                        <td>{real.score || "-"}</td>
 
-                            const real = results[id] || {};
+                                        {joueurs.map(j => {
 
-                            return (
+                                            const prono = pronos.find(
+                                                p => p.joueur === j && p.match_id === id
+                                            );
 
-                                <tr
-                                    key={id}
-                                    style={{
-                                        borderBottom: "1px solid #ddd"
-                                    }}
-                                >
+                                            const pts = prono
+                                                ? calculatePoints(prono, real)
+                                                : 0;
 
-                                    <td style={{
-                                        padding: 10,
-                                        fontWeight: "bold"
-                                    }}>
-                                        <div style={{
-                                            fontSize: 10,
-                                            color: "#888"
-                                        }}>
-                                            {id}
-                                        </div>
-
-                                        {real.teamA || "TBD"} vs {real.teamB || "TBD"}
-
-                                        <div style={{
-                                            marginTop: 5,
-                                            fontSize: 11,
-                                            color: "#666"
-                                        }}>
-                                            {real.status || "Scheduled"}
-                                        </div>
-                                    </td>
-
-                                    <td style={{
-                                        textAlign: "center",
-                                        fontWeight: "bold",
-                                        fontSize: 22
-                                    }}>
-                                        {real.score || "-"}
-                                    </td>
-
-                                    {joueurs.map(j => {
-
-                                        const prono = pronos.find(
-                                            p =>
-                                                p.joueur === j &&
-                                                p.match_id === id
-                                        );
-
-                                        const pts = prono
-                                            ? calculatePoints(prono, real)
-                                            : 0;
-
-                                        return (
-
-                                            <td
-                                                key={j}
-                                                style={{
-                                                    textAlign: "center",
-                                                    padding: 8,
-                                                    background:
-                                                        pts > 0
-                                                            ? "#e8ffe8"
-                                                            : "white"
-                                                }}
-                                            >
-
-                                                {prono ? (
-                                                    <>
-                                                        <div style={{
-                                                            fontSize: 11,
-                                                            color: "#555"
-                                                        }}>
-                                                            {prono.gagnant} {prono.score}
-                                                        </div>
-
-                                                        <div style={{
-                                                            fontWeight: "bold"
-                                                        }}>
+                                            return (
+                                                <td key={j}>
+                                                    {prono ? (
+                                                        <>
+                                                            {prono.gagnant} {prono.score}<br/>
                                                             +{pts}
-                                                        </div>
-                                                    </>
-                                                ) : "-"}
+                                                        </>
+                                                    ) : "-"}
+                                                </td>
+                                            );
 
-                                            </td>
+                                        })}
 
-                                        );
+                                    </tr>
+                                );
 
-                                    })}
+                            })}
 
-                                </tr>
+                        </tbody>
 
-                            );
+                    </table>
 
-                        })}
+                </div>
 
-                    </tbody>
-
-                </table>
-
-            </div>
+            )}
 
         </div>
 
     );
+
 }
 
-ReactDOM
-    .createRoot(document.getElementById("root"))
-    .render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
