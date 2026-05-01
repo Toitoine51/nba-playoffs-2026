@@ -63,6 +63,7 @@ function App() {
             );
 
             const json = await res.json();
+            alert(JSON.stringify(json.events?.[0], null, 2));
 
             const newResults = {};
 
