@@ -6,18 +6,13 @@ const { useState, useEffect } = React;
    LOAD PRONOS
 ====================== */
 
-let PRONOS = [];
+const [pronos, setPronos] = React.useState([]);
 
-setTimeout(() => {
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        "<div style='position:fixed;bottom:0;left:0;background:black;color:yellow;padding:10px;z-index:9999'>PRONOS OK: " + PRONOS.length + "</div>"
-    );
-}, 2000);
-
-fetch("./pronos.json")
-    .then(r => r.json())
-    .then(data => PRONOS = data);
+React.useEffect(() => {
+    fetch("./pronos.json")
+        .then(r => r.json())
+        .then(data => setPronos(data));
+}, []); 
 
 /* ======================
    STORAGE
