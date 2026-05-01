@@ -1,614 +1,142 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>NBA PLAYOFFS 2026</title>
-
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-body{
-    font-family: Helvetica, Arial, sans-serif;
-    background:#f0f2f5;
-    margin:0;
-    color:#111;
-}
-
-.nba-blue{
-    background:#1d428a;
-}
-
-.nba-red{
-    background:#c8102e;
-}
-
-.sticky-head{
-    position:sticky;
-    top:0;
-    z-index:100;
-}
-
-.table-scroll{
-    overflow-x:auto;
-}
-
-table{
-    border-collapse:collapse;
-    min-width:1400px;
-    width:100%;
-}
-
-th, td{
-    border:1px solid #dbe1e8;
-    padding:12px;
-    text-align:center;
-    background:white;
-}
-
-thead th{
-    background:#1d428a;
-    color:white;
-}
-
-.status-final{
-    background:#1d428a;
-    color:white;
-    font-size:11px;
-    padding:3px 7px;
-    border-radius:999px;
-    display:inline-block;
-    margin-top:6px;
-}
-
-.status-live{
-    background:#c8102e;
-    color:white;
-    font-size:11px;
-    padding:3px 7px;
-    border-radius:999px;
-    display:inline-block;
-    margin-top:6px;
-    animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-    0%{opacity:1}
-    50%{opacity:.5}
-    100%{opacity:1}
-}
-
-.rule-box{
-    background:white;
-    border-radius:12px;
-    padding:16px;
-    min-width:250px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.article-box{
-    background:white;
-    border-left:6px solid #c8102e;
-    padding:20px;
-    margin-bottom:24px;
-    border-radius:8px;
-    font-style:italic;
-    line-height:1.6;
-}
-
-.green{
-    background:#eefcf2;
-}
-
-.total{
-    color:#ffd54f;
-    font-size:20px;
-    font-weight:900;
-}
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NBA PLAYOFFS 2026</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; background:#f0f2f5; margin:0; color:#111; }
+        .nba-blue { background:#1d428a; }
+        .nba-red { background:#c8102e; }
+        .sticky-head { position:sticky; top:0; z-index:100; }
+        .table-scroll { overflow-x:auto; }
+        table { border-collapse:collapse; min-width:1400px; width:100%; }
+        th, td { border:1px solid #dbe1e8; padding:12px; text-align:center; background:white; }
+        thead th { background:#1d428a; color:white; }
+        .status-final { background:#1d428a; color:white; font-size:11px; padding:3px 7px; border-radius:999px; display:inline-block; margin-top:6px; }
+        .status-live { background:#c8102e; color:white; font-size:11px; padding:3px 7px; border-radius:999px; display:inline-block; margin-top:6px; animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%{opacity:1} 50%{opacity:.5} 100%{opacity:1} }
+        .rule-box { background:white; border-radius:12px; padding:16px; min-width:250px; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+        .article-box { background:white; border-left:6px solid #c8102e; padding:20px; margin-bottom:24px; border-radius:8px; font-style:italic; line-height:1.6; }
+        .green { background:#eefcf2; }
+        .total { color:#ffd54f; font-size:20px; font-weight:900; }
+    </style>
 </head>
-
 <body>
-
 <div id="root"></div>
-
 <script type="text/babel">
-
 const { useState, useMemo } = React;
 
-const JOUEURS = [
-"Guilhem",
-"Ousset",
-"Jeff",
-"Daude",
-"Antoine"
-];
+const JOUEURS = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
+const POINTS_CFG = { "R1": { winner:10, score:10 }, "Conf Semis": { winner:20, score:10 }, "Conf Finals": { winner:40, score:15 }, "Finals": { winner:80, score:20 } };
 
-const POINTS = {
-    "R1": { winner:10, score:10 },
-    "Conf Semis": { winner:20, score:10 },
-    "Conf Finals": { winner:40, score:15 },
-    "Finals": { winner:80, score:20 }
-};
-
+[span_4](start_span)// Tes données CSV intégrées[span_4](end_span)
 const PRONOS = [
-
-{joueur:"Guilhem",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-2",match_id:"R1-O1"},
-{joueur:"Guilhem",tour:"R1",gagnant:"LAL",perdant:"HOU",score:"4-3",match_id:"R1-O2"},
-{joueur:"Guilhem",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-1",match_id:"R1-O3"},
-{joueur:"Guilhem",tour:"R1",gagnant:"PHO",perdant:"SAS",score:"4-2",match_id:"R1-O4"},
-{joueur:"Guilhem",tour:"R1",gagnant:"DET",perdant:"CHA",score:"4-1",match_id:"R1-E1"},
-{joueur:"Guilhem",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-2",match_id:"R1-E2"},
-{joueur:"Guilhem",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-3",match_id:"R1-E3"},
-{joueur:"Guilhem",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-1",match_id:"R1-E4"},
-
-{joueur:"Ousset",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
-{joueur:"Ousset",tour:"R1",gagnant:"HOU",perdant:"LAL",score:"4-3",match_id:"R1-O2"},
-{joueur:"Ousset",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
-{joueur:"Ousset",tour:"R1",gagnant:"SAS",perdant:"PHO",score:"4-0",match_id:"R1-O4"},
-{joueur:"Ousset",tour:"R1",gagnant:"DET",perdant:"CHA",score:"4-1",match_id:"R1-E1"},
-{joueur:"Ousset",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-1",match_id:"R1-E2"},
-{joueur:"Ousset",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-1",match_id:"R1-E3"},
-{joueur:"Ousset",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-2",match_id:"R1-E4"},
-
-{joueur:"Jeff",tour:"R1",gagnant:"OKC",perdant:"PHO",score:"4-2",match_id:"R1-O1"},
-{joueur:"Jeff",tour:"R1",gagnant:"LAL",perdant:"HOU",score:"4-2",match_id:"R1-O2"},
-{joueur:"Jeff",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
-{joueur:"Jeff",tour:"R1",gagnant:"SAS",perdant:"POR",score:"4-1",match_id:"R1-O4"},
-{joueur:"Jeff",tour:"R1",gagnant:"DET",perdant:"ORL",score:"4-1",match_id:"R1-E1"},
-{joueur:"Jeff",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-3",match_id:"R1-E2"},
-{joueur:"Jeff",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-2",match_id:"R1-E3"},
-{joueur:"Jeff",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-2",match_id:"R1-E4"},
-
-{joueur:"Daude",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
-{joueur:"Daude",tour:"R1",gagnant:"HOU",perdant:"LAL",score:"4-2",match_id:"R1-O2"},
-{joueur:"Daude",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
-{joueur:"Daude",tour:"R1",gagnant:"SAS",perdant:"PHO",score:"4-1",match_id:"R1-O4"},
-{joueur:"Daude",tour:"R1",gagnant:"DET",perdant:"CHA",score:"4-1",match_id:"R1-E1"},
-{joueur:"Daude",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-2",match_id:"R1-E2"},
-{joueur:"Daude",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-2",match_id:"R1-E3"},
-{joueur:"Daude",tour:"R1",gagnant:"BOS",perdant:"ORL",score:"4-2",match_id:"R1-E4"},
-
-{joueur:"Antoine",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-0",match_id:"R1-O1"},
-{joueur:"Antoine",tour:"R1",gagnant:"HOU",perdant:"LAL",score:"4-2",match_id:"R1-O2"},
-{joueur:"Antoine",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
-{joueur:"Antoine",tour:"R1",gagnant:"SAS",perdant:"PHO",score:"4-1",match_id:"R1-O4"},
-{joueur:"Antoine",tour:"R1",gagnant:"DET",perdant:"ORL",score:"4-1",match_id:"R1-E1"},
-{joueur:"Antoine",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-2",match_id:"R1-E2"},
-{joueur:"Antoine",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-1",match_id:"R1-E3"},
-{joueur:"Antoine",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-3",match_id:"R1-E4"}
-
+    {joueur:"Guilhem",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-2",match_id:"R1-O1"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"LAL",perdant:"HOU",score:"4-3",match_id:"R1-O2"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-1",match_id:"R1-O3"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"PHO",perdant:"SAS",score:"4-2",match_id:"R1-O4"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"DET",perdant:"CHA",score:"4-1",match_id:"R1-E1"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-2",match_id:"R1-E2"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-3",match_id:"R1-E3"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-1",match_id:"R1-E4"},
+    {joueur:"Ousset",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
+    {joueur:"Ousset",tour:"R1",gagnant:"HOU",perdant:"LAL",score:"4-3",match_id:"R1-O2"},
+    {joueur:"Ousset",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
+    {joueur:"Ousset",tour:"R1",gagnant:"SAS",perdant:"PHO",score:"4-0",match_id:"R1-O4"},
+    {joueur:"Ousset",tour:"R1",gagnant:"DET",perdant:"CHA",score:"4-1",match_id:"R1-E1"},
+    {joueur:"Ousset",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-1",match_id:"R1-E2"},
+    {joueur:"Ousset",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-1",match_id:"R1-E3"},
+    {joueur:"Ousset",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-2",match_id:"R1-E4"},
+    {joueur:"Jeff",tour:"R1",gagnant:"OKC",perdant:"PHO",score:"4-2",match_id:"R1-O1"},
+    {joueur:"Jeff",tour:"R1",gagnant:"LAL",perdant:"HOU",score:"4-2",match_id:"R1-O2"},
+    {joueur:"Jeff",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
+    {joueur:"Jeff",tour:"R1",gagnant:"SAS",perdant:"POR",score:"4-1",match_id:"R1-O4"},
+    {joueur:"Jeff",tour:"R1",gagnant:"DET",perdant:"ORL",score:"4-1",match_id:"R1-E1"},
+    {joueur:"Jeff",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-3",match_id:"R1-E2"},
+    {joueur:"Jeff",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-2",match_id:"R1-E3"},
+    {joueur:"Jeff",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-2",match_id:"R1-E4"},
+    {joueur:"Daude",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
+    {joueur:"Daude",tour:"R1",gagnant:"HOU",perdant:"LAL",score:"4-2",match_id:"R1-O2"},
+    {joueur:"Daude",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
+    {joueur:"Daude",tour:"R1",gagnant:"SAS",perdant:"PHO",score:"4-1",match_id:"R1-O4"},
+    {joueur:"Daude",tour:"R1",gagnant:"DET",perdant:"CHA",score:"4-1",match_id:"R1-E1"},
+    {joueur:"Daude",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-2",match_id:"R1-E2"},
+    {joueur:"Daude",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-2",match_id:"R1-E3"},
+    {joueur:"Daude",tour:"R1",gagnant:"BOS",perdant:"ORL",score:"4-2",match_id:"R1-E4"},
+    {joueur:"Antoine",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-0",match_id:"R1-O1"},
+    {joueur:"Antoine",tour:"R1",gagnant:"HOU",perdant:"LAL",score:"4-2",match_id:"R1-O2"},
+    {joueur:"Antoine",tour:"R1",gagnant:"DEN",perdant:"MIN",score:"4-2",match_id:"R1-O3"},
+    {joueur:"Antoine",tour:"R1",gagnant:"SAS",perdant:"PHO",score:"4-1",match_id:"R1-O4"},
+    {joueur:"Antoine",tour:"R1",gagnant:"DET",perdant:"ORL",score:"4-1",match_id:"R1-E1"},
+    {joueur:"Antoine",tour:"R1",gagnant:"CLE",perdant:"TOR",score:"4-2",match_id:"R1-E2"},
+    {joueur:"Antoine",tour:"R1",gagnant:"NYK",perdant:"ATL",score:"4-1",match_id:"R1-E3"},
+    {joueur:"Antoine",tour:"R1",gagnant:"BOS",perdant:"PHI",score:"4-3",match_id:"R1-E4"}
 ];
 
-function App(){
+function App() {
+    const [results, setResults] = useState({});
+    const [lastImport, setLastImport] = useState(null);
+    const [article, setArticle] = useState("");
 
-const [results, setResults] = useState({});
-const [lastImport, setLastImport] = useState(null);
-const [article, setArticle] = useState("");
+    const fetchResults = async () => {
+        [span_5](start_span)// Logique de récupération via le futur Worker[span_5](end_span)
+        alert("Connectez d'abord votre Cloudflare Worker pour voir les scores réels !");
+    };
 
-const fetchResults = async () => {
+    function calculatePoints(prono, real) {
+        if (!real || real.status !== "Final") return 0;
+        let pts = 0;
+        if (prono.gagnant === real.winner) {
+            [span_6](start_span)pts += POINTS_CFG[prono.tour].winner;[span_6](end_span)
+            [span_7](start_span)if (prono.perdant === real.loser) pts += 10;[span_7](end_span)
+            [span_8](start_span)if (prono.score === real.score) pts += POINTS_CFG[prono.tour].score;[span_8](end_span)
+        }
+        return pts;
+    }
 
-const LOCAL_RESULTS = {
+    const totals = useMemo(() => {
+        const t = {};
+        JOUEURS.forEach(j => t[j] = 0);
+        PRONOS.forEach(p => {
+            if (results[p.match_id]) t[p.joueur] += calculatePoints(p, results[p.match_id]);
+        });
+        return t;
+    }, [results]);
 
-"R1-O1":{
-teamA:"OKC",
-teamB:"LAC",
-score:"4-1",
-winner:"OKC",
-loser:"LAC",
-status:"Final"
-},
-
-"R1-O2":{
-teamA:"LAL",
-teamB:"HOU",
-score:"2-2",
-winner:null,
-loser:null,
-status:"En cours"
-},
-
-"R1-O3":{
-teamA:"DEN",
-teamB:"MIN",
-score:"4-2",
-winner:"DEN",
-loser:"MIN",
-status:"Final"
-},
-
-"R1-O4":{
-teamA:"SAS",
-teamB:"PHO",
-score:"3-1",
-winner:null,
-loser:null,
-status:"En cours"
-},
-
-"R1-E1":{
-teamA:"DET",
-teamB:"CHA",
-score:"4-1",
-winner:"DET",
-loser:"CHA",
-status:"Final"
-},
-
-"R1-E2":{
-teamA:"CLE",
-teamB:"TOR",
-score:"3-2",
-winner:null,
-loser:null,
-status:"En cours"
-},
-
-"R1-E3":{
-teamA:"NYK",
-teamB:"ATL",
-score:"4-2",
-winner:"NYK",
-loser:"ATL",
-status:"Final"
-},
-
-"R1-E4":{
-teamA:"BOS",
-teamB:"PHI",
-score:"4-3",
-winner:"BOS",
-loser:"PHI",
-status:"Final"
+    return (
+        <div className="p-4">
+            [span_9](start_span)<h1 className="text-4xl font-black italic text-[#1d428a] mb-4">NBA PLAYOFFS 2026</h1>[span_9](end_span)
+            <div className="flex gap-2 mb-6">
+                [span_10](start_span)[span_11](start_span)<button onClick={fetchResults} className="nba-blue text-white p-3 rounded font-bold">🔄 RÉCUPÉRER LES RÉSULTATS</button>[span_10](end_span)[span_11](end_span)
+                [span_12](start_span)<button onClick={() => setArticle("Leader : " + JOUEURS[0])} className="nba-red text-white p-3 rounded font-bold">📰 GÉNÉRER L'ARTICLE</button>[span_12](end_span)
+            </div>
+            {article && <div className="article-box">{article}</div>}
+            <div className="table-scroll">
+                <table>
+                    [span_13](start_span)<thead className="sticky-head">[span_13](end_span)
+                        <tr>
+                            <th>Tour</th><th>Match</th><th>Score</th>
+                            {JOUEURS.map(j => <th key={j}>{j}<br/><span className="total">{totals[j]} pts</span></th>)}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Array.from(new Set(PRONOS.map(p => p.match_id))).map(id => (
+                            <tr key={id}><td>{id}</td><td>-</td><td>-</td>{JOUEURS.map(j => <td key={j}>-</td>)}</tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
 }
 
-};
-
-setResults(LOCAL_RESULTS);
-
-setLastImport(
-new Date().toLocaleString("fr-FR")
-);
-
-};
-
-function calculatePoints(prono, real){
-
-if(!real) return 0;
-
-if(real.status !== "Final") return 0;
-
-let pts = 0;
-
-if(prono.gagnant === real.winner){
-
-pts += POINTS[prono.tour].winner;
-
-if(prono.perdant === real.loser){
-pts += 10;
-}
-
-if(prono.score === real.score){
-pts += POINTS[prono.tour].score;
-}
-
-}
-
-return pts;
-}
-
-const totals = useMemo(() => {
-
-const t = {};
-
-JOUEURS.forEach(j => t[j] = 0);
-
-PRONOS.forEach(p => {
-
-t[p.joueur] += calculatePoints(
-p,
-results[p.match_id]
-);
-
-});
-
-return t;
-
-}, [results]);
-
-const generateArticle = () => {
-
-const ranking =
-[...JOUEURS].sort(
-(a,b)=>totals[b]-totals[a]
-);
-
-const leader = ranking[0];
-const loser = ranking[ranking.length-1];
-
-setArticle(`
-Dans une ambiance de playoffs totalement électrique, ${leader} prend les commandes du classement avec des prédictions chirurgicales dignes d’un insider NBA.
-
-À l’opposé du terrain… ${loser} continue d’enchaîner les takes catastrophiques. Certains observateurs parlent déjà du pire run depuis les Charlotte Bobcats.
-
-Le tournoi est encore long, mais la pression monte sérieusement.
-`);
-
-};
-
-const matches = Array
-.from(new Set(PRONOS.map(p=>p.match_id)))
-.map(id => PRONOS.find(p=>p.match_id===id))
-.filter(m => results[m.match_id]);
-
-return (
-
-<div className="p-4">
-
-<div className="flex flex-col lg:flex-row gap-6 justify-between mb-6">
-
-<div className="bg-white p-6 rounded-xl shadow w-full">
-
-<h1 className="text-4xl font-black italic text-[#1d428a]">
-NBA PLAYOFFS 2026
-</h1>
-
-<p className="text-gray-500 mt-2">
-Dernier import :
-{" "}
-{lastImport || "Jamais"}
-</p>
-
-<div className="flex gap-3 mt-5 flex-wrap">
-
-<button
-onClick={fetchResults}
-className="nba-blue text-white px-5 py-3 rounded-lg font-bold"
->
-🔄 RÉCUPÉRER LES RÉSULTATS
-</button>
-
-<button
-onClick={generateArticle}
-className="nba-red text-white px-5 py-3 rounded-lg font-bold"
->
-📰 GÉNÉRER L'ARTICLE
-</button>
-
-</div>
-
-</div>
-
-<div className="rule-box">
-
-<h2 className="font-black mb-3">
-BARÈME
-</h2>
-
-<table className="w-full text-sm">
-
-<thead>
-<tr>
-<th>Tour</th>
-<th>V</th>
-<th>P</th>
-<th>S</th>
-</tr>
-</thead>
-
-<tbody>
-
-<tr>
-<td>R1</td>
-<td>10</td>
-<td>10</td>
-<td>10</td>
-</tr>
-
-<tr>
-<td>Demies</td>
-<td>20</td>
-<td>10</td>
-<td>10</td>
-</tr>
-
-<tr>
-<td>Conf</td>
-<td>40</td>
-<td>10</td>
-<td>15</td>
-</tr>
-
-<tr>
-<td>Finals</td>
-<td>80</td>
-<td>10</td>
-<td>20</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-{
-article &&
-<div className="article-box">
-{article}
-</div>
-}
-
-<div className="table-scroll">
-
-<table>
-
-<thead className="sticky-head">
-
-<tr>
-
-<th>Tour</th>
-
-<th>Match Réel</th>
-
-<th>Score Officiel</th>
-
-{
-JOUEURS.map(j => (
-<th key={j}>
-
-<div className="font-black text-lg">
-{j}
-</div>
-
-<div className="total">
-{totals[j]} pts
-</div>
-
-</th>
-))
-}
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{
-matches.map(m => {
-
-const real = results[m.match_id];
-
-return (
-
-<tr key={m.match_id}>
-
-<td>
-<b>{m.tour}</b>
-</td>
-
-<td>
-
-<div className="font-black text-lg">
-{real.teamA} vs {real.teamB}
-</div>
-
-<div className={
-real.status === "Final"
-?
-"status-final"
-:
-"status-live"
-}>
-{real.status}
-</div>
-
-</td>
-
-<td className="font-black text-xl">
-{real.score}
-</td>
-
-{
-JOUEURS.map(j => {
-
-const prono = PRONOS.find(
-p =>
-p.joueur === j &&
-p.match_id === m.match_id
-);
-
-const pts =
-calculatePoints(prono, real);
-
-return (
-
-<td
-key={j}
-className={pts > 0 ? "green" : ""}
->
-
-<div className="text-xs text-gray-500">
-{prono.gagnant} {prono.score}
-</div>
-
-<div className="mt-2 text-[11px]">
-
-{
-prono.gagnant === real.winner
-?
-"✅ V"
-:
-"❌ V"
-}
-
-{" | "}
-
-{
-prono.perdant === real.loser
-?
-"✅ P"
-:
-"❌ P"
-}
-
-{" | "}
-
-{
-prono.score === real.score
-?
-"✅ S"
-:
-"❌ S"
-}
-
-</div>
-
-<div className="font-black text-lg mt-2">
-+{pts}
-</div>
-
-</td>
-
-);
-
-})
-}
-
-</tr>
-
-);
-
-})
-}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-);
-
-}
-
-const root =
-ReactDOM.createRoot(
-document.getElementById("root")
-);
-
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
-
 </script>
-
 </body>
 </html>
