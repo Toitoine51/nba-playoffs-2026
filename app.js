@@ -71,6 +71,10 @@ function App() {
                 {loading ? "Loading..." : "Fetch"}
             </button>
 
+               <pre style={{ background: "black", color: "lime", padding: 10, fontSize: 10 }}>
+{JSON.stringify(results, null, 2)}
+</pre>
+
             <table border="1" width="100%" cellPadding="5">
 
                 <thead>
