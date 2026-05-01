@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <title>NBA PLAYOFFS 2026</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; background:#f0f2f5; margin:0; padding:0; color:#111; width: 100%; overflow-x: hidden; }
+        .nba-blue { background:#1d428a; }
+        .nba-red { background:#c8102e; }
+        .table-scroll { width: 100vw; overflow-x: auto; -webkit-overflow-scrolling: touch; background: white; }
+        table { border-collapse:collapse; min-width:1000px; width:100%; }
+        th, td { border:1px solid #dbe1e8; padding:12px 8px; text-align:center; }
+        thead th { background:#1d428a; color:white; position:sticky; top:0; }
+        .status-final { background:#1d428a; color:white; font-size:11px; padding:3px 7px; border-radius:999px; }
+        .status-live { background:#c8102e; color:white; font-size:11px; padding:3px 7px; border-radius:999px; animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%{opacity:1} 50%{opacity:.5} 100%{opacity:1} }
+        .green { background:#eefcf2; }
+        .total { color:#ffd54f; font-size:20px; font-weight:900; }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+const JOUEURS = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
+const POINTS_CFG = { "R1": { winner:10, score:10 } };
+
+// Tes pronostics restent inchangés
+const PRONOS = [
+    {joueur:"Guilhem",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-2",match_id:"R1-O1"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"LAL",perdant:"HOU",score:"4-3",match_id:"R1-O2"},
+    {joueur:"Ousset",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
+    {joueur:"Jeff",tour:"R1",gagnant:"OKC",perdant:"PHO",score:"4-2",match_id:"R1-O1"},
+    {joueur:"Daude",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
+    {joueur:"Antoine",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-0",match_id:"R1-O1"}
+];
+
+function App() {
+    const [results, setResults] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    const fetchResults = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch("https://yellow-forest-00ef.toitoine51.workers.dev/");
+            const json = await response.json();
+            
+            const newResults = {};
+            if (json.data) {
+                json.data.forEach(game => {
+                    // Utilisation de l'ID dynamique envoyé par le Worker
+                    newResults[game.id] = {
+                        teamA: game.home_team.abbreviation,
+                        teamB: game.visitor_team.abbreviation,
+                        score: `${game.home_team_score}-${game.visitor_team_score}`,
+                        winner: game.home_team_score > game.visitor_team_score ? game.home_team.abbreviation : game.visitor_team.abbreviation,
+                        loser: game.home_team_score > game.visitor_team_score ? game.visitor_team.abbreviation : game.home_team.abbreviation,
+                        status: game.status
+                    };
+                });
+            }
+            
+            setResults(newResults);
+        } catch (e) {
+            console.error(e);
+            alert("Erreur de connexion au Worker.");
+        }
+        setLoading(false);
+    };
+
+    const calculatePoints = (prono, real) => {
+        if (!real || real.status !== "Final") return 0;
+        let pts = 0;
+        if (prono.gagnant === real.winner) {
+            pts += POINTS_CFG[prono.tour].winner;
+            if (prono.score === real.score) pts += POINTS_CFG[prono.tour].score;
+        }
+        return pts;
+    };
+
+    const totals = useMemo(() => {
+        const t = {};
+        JOUEURS.forEach(j => {
+            t[j] = PRONOS.filter(p => p.joueur === j)
+                         .reduce((sum, p) => sum + calculatePoints(p, results[p.match_id]), 0);
+        });
+        return t;
+    }, [results]);
+
+    // Liste étendue pour le Round 1 (Ouest et Est)
+    const matches = ["R1-O1", "R1-O2", "R1-O3", "R1-O4", "R1-E1", "R1-E2", "R1-E3", "R1-E4"];
+
+    return (
+        <div className="w-full">
+            <header className="p-4 bg-[#1d428a] text-white shadow-lg">
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-black italic">NBA PLAYOFFS 2026</h1>
+                    <div className="text-[10px] bg-white/20 px-2 py-1 rounded">LIVE SCRAPER v2</div>
+                </div>
+                <button 
+                    onClick={fetchResults} 
+                    disabled={loading} 
+                    className="mt-4 w-full bg-red-600 active:bg-red-800 px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest shadow-md transition-all"
+                >
+                    {loading ? "Chargement des scores..." : "🔄 Actualiser les scores"}
+                </button>
+            </header>
+
+            <div className="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Série</th><th>Score Série</th>
+                            {JOUEURS.map(j => (
+                                <th key={j} className="min-w-[120px]">
+                                    <div className="text-xs opacity-80 uppercase">{j}</div>
+                                    <div className="total">{totals[j]}</div>
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {matches.map(id => {
+                            const res = results[id] || { teamA: "À venir", teamB: "", score: "-", status: "Wait" };
+                            return (
+                                <tr key={id}>
+                                    <td className="text-left font-bold p-4">
+                                        <div className="text-[10px] text-gray-400 mb-1">{id}</div>
+                                        {res.teamA} {res.teamB ? 'vs ' + res.teamB : ''}
+                                        <br/>
+                                        <span className={res.status === "Final" ? "status-final" : "status-live text-[10px]"}>
+                                            {res.status === "Wait" ? "En attente" : res.status}
+                                        </span>
+                                    </td>
+                                    <td className="text-2xl font-black bg-gray-50">{res.score}</td>
+                                    {JOUEURS.map(j => {
+                                        const p = PRONOS.find(pr => pr.joueur === j && pr.match_id === id);
+                                        const pts = calculatePoints(p, results[id]);
+                                        return (
+                                            <td key={j} className={pts > 0 ? "green" : ""}>
+                                                {p ? (
+                                                    <>
+                                                        <div className="text-[10px] text-gray-500">{p.gagnant} in {p.score.split('-')[0]}</div>
+                                                        <div className="font-bold text-lg">+{pts}</div>
+                                                    </>
+                                                ) : "-"}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
+
