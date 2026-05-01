@@ -61,8 +61,10 @@ function App() {
             const res = await fetch(
                 "https://scrap.toitoine51.workers.dev/?start=20260414&days=3"
             );
+           alert("FETCH OK");
 
             const json = await res.json();
+            alert("JSON OK");
             alert(JSON.stringify(json.events?.[0], null, 2));
 
             const newResults = {};
