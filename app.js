@@ -102,7 +102,7 @@ function App() {
 
                                 {joueurs.map(j => {
 
-                                    const prono = PRONOS.find(
+                                    const prono = pronos.find(
                                         p => p.joueur === j && p.match_id === id
                                     );
 
