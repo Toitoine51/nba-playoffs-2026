@@ -15,7 +15,7 @@ setTimeout(() => {
     );
 }, 2000);
 
-fetch("./prono.json")
+fetch("./pronos.json")
     .then(r => r.json())
     .then(data => PRONOS = data);
 
