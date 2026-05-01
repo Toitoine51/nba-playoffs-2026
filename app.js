@@ -6,6 +6,13 @@ const { useState, useEffect } = React;
 
 let PRONOS = [];
 
+setTimeout(() => {
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        "<div style='position:fixed;bottom:0;left:0;background:black;color:yellow;padding:10px;z-index:9999'>PRONOS OK: " + PRONOS.length + "</div>"
+    );
+}, 2000);
+
 fetch("./prono.json")
     .then(r => r.json())
     .then(data => PRONOS = data);
