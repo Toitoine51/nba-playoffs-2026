@@ -1,7 +1,7 @@
 const { useState, useEffect, useMemo } = React;
 
 /* ======================
-   STORAGE RESULTS (SERIES)
+   STORAGE
 ====================== */
 
 function loadResults() {
@@ -12,16 +12,11 @@ function saveResults(data) {
     localStorage.setItem("nba_results", JSON.stringify(data));
 }
 
-/* ======================
-   STORAGE MATCHES (RAW API)
-====================== */
-
 function loadMatches() {
     return JSON.parse(localStorage.getItem("nba_matches") || "{}");
 }
 
-function saveMatches(data, setRawMatches) {
-
+function saveMatches(data) {
     const existing = loadMatches();
 
     const merged = {
@@ -30,7 +25,6 @@ function saveMatches(data, setRawMatches) {
     };
 
     localStorage.setItem("nba_matches", JSON.stringify(merged));
-    setRawMatches(merged);
 }
 
 /* ======================
@@ -55,11 +49,11 @@ function App() {
         fetch("./pronos.json")
             .then(r => r.json())
             .then(data => setPronos(data))
-            .catch(err => console.error("PRONOS ERROR:", err));
+            .catch(err => console.error(err));
     }, []);
 
     /* ======================
-       SAVE SERIES RESULTS
+       SAVE RESULTS SERIES
     ====================== */
 
     useEffect(() => {
@@ -67,7 +61,7 @@ function App() {
     }, [results]);
 
     /* ======================
-       FETCH MATCHS (3 DAYS CHUNKS)
+       FETCH MATCHES (3 DAYS)
     ====================== */
 
     const fetchResults = async () => {
@@ -97,17 +91,23 @@ function App() {
 
             });
 
-            saveMatches(newResults, setRawMatches);
+            // stockage brut
+            saveMatches(newResults);
+
+            setRawMatches(prev => ({
+                ...prev,
+                ...newResults
+            }));
 
         } catch (e) {
-            console.error("FETCH ERROR:", e);
+            console.error(e);
         }
 
         setLoading(false);
     };
 
     /* ======================
-       POINTS CALCULATION
+       POINTS
     ====================== */
 
     const calculatePoints = (prono, real) => {
@@ -126,7 +126,7 @@ function App() {
     };
 
     /* ======================
-       MATCH IDS (SERIES VIEW)
+       MATCH LIST
     ====================== */
 
     const matches = [
@@ -149,17 +149,14 @@ function App() {
             t[j] = pronos
                 .filter(p => p.joueur === j)
                 .reduce((sum, p) => {
-
-                    const real = results[p.match_id];
-                    return sum + calculatePoints(p, real);
-
+                    return sum + calculatePoints(p, rawMatches[p.match_id]);
                 }, 0);
 
         });
 
         return t;
 
-    }, [pronos, results]);
+    }, [pronos, rawMatches]);
 
     /* ======================
        RENDER
@@ -196,7 +193,7 @@ function App() {
             </div>
 
             {/* ======================
-               PRONOS TAB
+               PRONOS
             ====================== */}
 
             {tab === "pronos" && (
@@ -206,27 +203,17 @@ function App() {
             )}
 
             {/* ======================
-               RAW MATCHES TAB
+               RAW MATCHES
             ====================== */}
 
             {tab === "raw" && (
-                <div>
-
-                    <h3>Matchs stockés (localStorage)</h3>
-
-                    <pre style={{
-                        background: "black",
-                        color: "cyan",
-                        padding: 10
-                    }}>
-                        {JSON.stringify(rawMatches, null, 2)}
-                    </pre>
-
-                </div>
+                <pre style={{ background: "black", color: "cyan", padding: 10 }}>
+                    {JSON.stringify(rawMatches, null, 2)}
+                </pre>
             )}
 
             {/* ======================
-               SERIES TAB
+               SERIES TABLE
             ====================== */}
 
             {tab === "series" && (
@@ -307,4 +294,4 @@ function App() {
 
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />); 
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
