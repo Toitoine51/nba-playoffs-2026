@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <title>NBA PLAYOFFS 2026</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; background:#f0f2f5; margin:0; padding:0; color:#111; width: 100%; overflow-x: hidden; }
+        .nba-blue { background:#1d428a; }
+        .nba-red { background:#c8102e; }
+        .sticky-head { position:sticky; top:0; z-index:100; }
+        
+        /* Correction pour prendre toute la largeur */
+        .table-scroll { 
+            width: 100vw; 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+            background: white;
+        }
+        
+        table { border-collapse:collapse; min-width:1200px; width:100%; }
+        th, td { border:1px solid #dbe1e8; padding:12px 8px; text-align:center; background:white; }
+        thead th { background:#1d428a; color:white; }
+        
+        .status-final { background:#1d428a; color:white; font-size:11px; padding:3px 7px; border-radius:999px; display:inline-block; margin-top:6px; }
+        .status-live { background:#c8102e; color:white; font-size:11px; padding:3px 7px; border-radius:999px; display:inline-block; margin-top:6px; animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%{opacity:1} 50%{opacity:.5} 100%{opacity:1} }
+        .green { background:#eefcf2; }
+        .total { color:#ffd54f; font-size:18px; font-weight:900; }
+        .article-box { background:white; border-left:6px solid #c8102e; padding:15px; margin:15px; border-radius:8px; font-style:italic; }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+const JOUEURS = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
+const POINTS_CFG = { "R1": { winner:10, score:10 }, "Conf Semis": { winner:20, score:10 }, "Conf Finals": { winner:40, score:15 }, "Finals": { winner:80, score:20 } };
+
+const PRONOS = [
+    {joueur:"Guilhem",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-2",match_id:"R1-O1"},
+    {joueur:"Guilhem",tour:"R1",gagnant:"LAL",perdant:"HOU",score:"4-3",match_id:"R1-O2"},
+    {joueur:"Ousset",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
+    {joueur:"Jeff",tour:"R1",gagnant:"OKC",perdant:"PHO",score:"4-2",match_id:"R1-O1"},
+    {joueur:"Daude",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-1",match_id:"R1-O1"},
+    {joueur:"Antoine",tour:"R1",gagnant:"OKC",perdant:"LAC",score:"4-0",match_id:"R1-O1"}
+];
+
+// Liste des matchs pour l'affichage (Simulation en attendant le Worker)
+const matches = [
+    { tour: "R1", match_id: "R1-O1", teamA: "OKC", teamB: "LAC" },
+    { tour: "R1", match_id: "R1-O2", teamA: "LAL", teamB: "HOU" }
+];
+
+function App() {
+    const [results, setResults] = useState({
+        "R1-O1": { teamA: "OKC", teamB: "LAC", score: "4-1", winner: "OKC", loser: "LAC", status: "Final" },
+        "R1-O2": { teamA: "LAL", teamB: "HOU", score: "2-2", winner: null, loser: null, status: "Live" }
+    });
+    const [article, setArticle] = useState("");
+
+    function calculatePoints(prono, real) {
+        if (!real || real.status !== "Final" || !prono) return 0;
+        let pts = 0;
+        if (prono.gagnant === real.winner) {
+            pts += POINTS_CFG[prono.tour].winner;
+            if (prono.perdant === real.loser) pts += 10;
+            if (prono.score === real.score) pts += POINTS_CFG[prono.tour].score;
+        }
+        return pts;
+    }
+
+    const totals = useMemo(() => {
+        const t = {};
+        JOUEURS.forEach(j => t[j] = 0);
+        PRONOS.forEach(p => {
+            if (results[p.match_id]) t[p.joueur] += calculatePoints(p, results[p.match_id]);
+        });
+        return t;
+    }, [results]);
+
+    return (
+        <div className="w-full">
+            <header className="p-4 bg-white shadow-sm">
+                <h1 className="text-3xl font-black italic text-[#1d428a]">NBA PLAYOFFS 2026</h1>
+                <div className="flex gap-2 mt-4">
+                    <button onClick={() => alert("Etape suivante : Cloudflare Worker")} className="nba-blue text-white px-4 py-2 rounded font-bold text-sm">🔄 ACTUALISER</button>
+                    <button onClick={() => setArticle("Analyse : " + JOUEURS[0] + " est en tête !")} className="nba-red text-white px-4 py-2 rounded font-bold text-sm">📰 ARTICLE</button>
+                </div>
+            </header>
+
+            {article && <div className="article-box">{article}</div>}
+
+            <div className="table-scroll">
+                <table>
+                    <thead className="sticky-head">
+                        <tr>
+                            <th>Tour</th><th>Match</th><th>Score</th>
+                            {JOUEURS.map(j => (
+                                <th key={j}>
+                                    <div className="text-sm font-bold">{j}</div>
+                                    <div className="total">{totals[j]}</div>
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {matches.map(m => {
+                            const real = results[m.match_id] || {};
+                            return (
+                                <tr key={m.match_id}>
+                                    <td className="text-xs font-bold">{m.tour}</td>
+                                    <td>
+                                        <div className="font-bold text-sm">{m.teamA} vs {m.teamB}</div>
+                                        <div className={real.status === "Final" ? "status-final" : "status-live"}>{real.status}</div>
+                                    </td>
+                                    <td className="font-black">{real.score || "-"}</td>
+                                    {JOUEURS.map(j => {
+                                        const prono = PRONOS.find(p => p.joueur === j && p.match_id === m.match_id);
+                                        const pts = calculatePoints(prono, real);
+                                        return (
+                                            <td key={j} className={pts > 0 ? "green" : ""}>
+                                                <div className="text-[10px] text-gray-400">{prono?.gagnant} {prono?.score}</div>
+                                                <div className="font-bold">+{pts}</div>
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
