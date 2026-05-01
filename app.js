@@ -1,107 +1,58 @@
-const { useState, useEffect, useMemo } = React;
+const { useState, useEffect } = React;
 
-/* =========================
-   PRONOS
-========================= */
+/* ======================
+   LOAD PRONOS
+====================== */
 
 let PRONOS = [];
 
 fetch("./prono.json")
     .then(r => r.json())
-    .then(data => {
-        PRONOS = data;
-    });
+    .then(data => PRONOS = data);
 
-/* =========================
+/* ======================
    STORAGE
-========================= */
+====================== */
 
 function loadResults() {
-    const saved = localStorage.getItem("nba_results");
-    return saved ? JSON.parse(saved) : {};
+    return JSON.parse(localStorage.getItem("nba_results") || "{}");
 }
 
 function saveResults(data) {
     localStorage.setItem("nba_results", JSON.stringify(data));
 }
 
-function loadFetched() {
-    const saved = localStorage.getItem("nba_fetched");
-    return saved ? JSON.parse(saved) : [];
-}
-
-function saveFetched(data) {
-    localStorage.setItem("nba_fetched", JSON.stringify(data));
-}
-
-/* =========================
+/* ======================
    APP
-========================= */
+====================== */
 
 function App() {
 
     const [results, setResults] = useState(loadResults());
-    const [fetched, setFetched] = useState(loadFetched());
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        saveResults(results);
-    }, [results]);
-
-    useEffect(() => {
-        saveFetched(fetched);
-    }, [fetched]);
-
-    /* =========================
-       FETCH MATCHS
-    ========================= */
 
     const fetchResults = async () => {
 
-        const startStr = "20260414";
-
-        if (fetched.includes(startStr)) return;
-
         setLoading(true);
 
-        try {
-            const res = await fetch(
-                `https://scrap2.toitoine51.workers.dev/?start=${startStr}&days=3`
-            );
+        const res = await fetch(
+            "https://scrap2.toitoine51.workers.dev/?start=20260414&days=3"
+        );
 
-            const json = await res.json();
+        const json = await res.json();
 
-            const newResults = {};
+        const newResults = {};
 
-            (json.events || []).forEach(m => {
-                newResults[m.match_id] = m;
-            });
+        (json.events || []).forEach(m => {
+            newResults[m.match_id] = m;
+        });
 
-            setResults(prev => ({ ...prev, ...newResults }));
-            setFetched(prev => [...prev, startStr]);
+        const updated = { ...results, ...newResults };
 
-        } catch (e) {
-            console.error(e);
-        }
+        setResults(updated);
+        saveResults(updated);
 
         setLoading(false);
-    };
-
-    /* =========================
-       POINTS
-    ========================= */
-
-    const calculatePoints = (prono, real) => {
-        if (!real || real.status !== "Final") return 0;
-
-        let pts = 0;
-
-        if (prono.gagnant === real.winner) {
-            pts += 10;
-            if (prono.score === real.score) pts += 10;
-        }
-
-        return pts;
     };
 
     const matches = [
@@ -111,86 +62,55 @@ function App() {
 
     const joueurs = ["Guilhem","Ousset","Jeff","Daude","Antoine"];
 
-    /* =========================
-       RENDER
-    ========================= */
-
     return (
-        <div className="p-3">
+        <div style={{ padding: 10 }}>
 
-            <h1 className="text-xl font-black mb-3">
-                NBA PLAYOFFS 2026
-            </h1>
+            <h2>NBA PLAYOFFS 2026</h2>
 
-            <button
-                onClick={fetchResults}
-                className="bg-red-600 text-white px-4 py-2 rounded"
-            >
-                {loading ? "Loading..." : "Fetch matches"}
+            <button onClick={fetchResults}>
+                {loading ? "Loading..." : "Fetch"}
             </button>
 
-            <div className="mt-4 overflow-x-auto">
+            <table border="1" width="100%" cellPadding="5">
 
-                <table className="w-full bg-white text-sm">
+                <thead>
+                    <tr>
+                        <th>Match</th>
+                        <th>Score</th>
+                        {joueurs.map(j => <th key={j}>{j}</th>)}
+                    </tr>
+                </thead>
 
-                    <thead>
-                        <tr className="bg-blue-900 text-white">
-                            <th className="p-2">Match</th>
-                            <th className="p-2">Score</th>
-                            {joueurs.map(j => (
-                                <th key={j} className="p-2">{j}</th>
-                            ))}
-                        </tr>
-                    </thead>
+                <tbody>
 
-                    <tbody>
+                    {matches.map(id => {
 
-                        {matches.map(id => {
+                        const real = results[id];
 
-                            const real = results[id];
+                        return (
+                            <tr key={id}>
+                                <td>{id}</td>
+                                <td>{real ? real.score : "-"}</td>
 
-                            return (
-                                <tr key={id} className="border-b">
+                                {joueurs.map(j => {
 
-                                    <td className="p-2 font-bold">
-                                        {id}
-                                    </td>
+                                    const prono = PRONOS.find(
+                                        p => p.joueur === j && p.match_id === id
+                                    );
 
-                                    <td className="p-2">
-                                        {real ? real.score : "-"}
-                                    </td>
+                                    return (
+                                        <td key={j}>
+                                            {prono ? prono.gagnant : "-"}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        );
+                    })}
 
-                                    {joueurs.map(j => {
+                </tbody>
 
-                                        const prono = PRONOS.find(
-                                            p => p.joueur === j && p.match_id === id
-                                        );
-
-                                        const pts = prono ? calculatePoints(prono, real) : 0;
-
-                                        return (
-                                            <td key={j} className="p-2 text-center">
-                                                {prono ? (
-                                                    <div>
-                                                        <div>{prono.gagnant}</div>
-                                                        <div className="font-bold">
-                                                            +{pts}
-                                                        </div>
-                                                    </div>
-                                                ) : "-"}
-                                            </td>
-                                        );
-                                    })}
-
-                                </tr>
-                            );
-                        })}
-
-                    </tbody>
-
-                </table>
-
-            </div>
+            </table>
 
         </div>
     );
