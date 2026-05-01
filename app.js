@@ -36,7 +36,7 @@ function App() {
         setLoading(true);
 
         const res = await fetch(
-            "https://scrap2.toitoine51.workers.dev/?start=20260414&days=3"
+            "https://scrap.toitoine51.workers.dev/?start=20260414&days=3"
         );
 
         const json = await res.json();
