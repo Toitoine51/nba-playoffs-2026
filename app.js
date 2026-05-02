@@ -1,3 +1,5 @@
+console.log("APP LOADED");
+
 const { useState, useEffect, useMemo } = React;
 
 /* ======================
