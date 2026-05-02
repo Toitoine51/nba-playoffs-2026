@@ -17,7 +17,6 @@ function loadMatches() {
 }
 
 function saveMatches(data) {
-
     const existing = loadMatches();
 
     const merged = {
@@ -50,10 +49,7 @@ function App() {
 
         fetch("./pronos.json?v=1")
             .then(r => r.json())
-            .then(data => {
-                console.log("PRONOS LOADED");
-                setPronos(data);
-            })
+            .then(data => setPronos(data))
             .catch(err => {
                 console.error("PRONOS ERROR", err);
                 setPronos([]);
@@ -85,19 +81,32 @@ function App() {
 
             const json = await res.json();
 
-            console.log("FETCH OK", json);
-
             const newResults = {};
 
             (json.events || []).forEach(m => {
 
-                newResults[m.match_id] = {
+                const key =
+                    m.match_id ||
+                    m.id ||
+                    m.game_id ||
+                    m.event_id;
+
+                if (!key) return;
+
+                const statusText =
+                    m.status?.type?.description ||
+                    m.status ||
+                    "Scheduled";
+
+                newResults[key] = {
+
                     score: m.series_score || m.score || "-",
                     winner: m.winner || "",
                     loser: m.loser || "",
-                    status: m.status || "Scheduled",
+                    status: statusText,
                     teamA: m.team_a || "",
                     teamB: m.team_b || ""
+
                 };
 
             });
@@ -110,9 +119,7 @@ function App() {
             }));
 
         } catch (e) {
-
             console.error("FETCH ERROR", e);
-
         }
 
         setLoading(false);
@@ -125,7 +132,12 @@ function App() {
     const calculatePoints = (prono, real) => {
 
         if (!real) return 0;
-        if (real.status !== "Final") return 0;
+
+        const isFinal =
+            real.status === "Final" ||
+            real.status?.type?.description === "Final";
+
+        if (!isFinal) return 0;
 
         let pts = 0;
 
@@ -136,6 +148,7 @@ function App() {
             if (prono.score === real.score) {
                 pts += 10;
             }
+
         }
 
         return pts;
@@ -177,12 +190,10 @@ function App() {
             t[j] = pronos
                 .filter(p => p.joueur === j)
                 .reduce((sum, p) => {
-
                     return sum + calculatePoints(
                         p,
                         rawMatches[p.match_id]
                     );
-
                 }, 0);
 
         });
@@ -197,7 +208,7 @@ function App() {
 
     return (
 
-        <div style={{ padding: 10 }}>
+        <div style={{ padding: 10, fontFamily: "Arial" }}>
 
             <h1>NBA PLAYOFFS 2026</h1>
 
@@ -205,16 +216,9 @@ function App() {
                 {loading ? "Loading..." : "Fetch 3 jours"}
             </button>
 
-            {/* ======================
-               TABS
-            ====================== */}
+            {/* TABS */}
 
-            <div style={{
-                display: "flex",
-                gap: 10,
-                marginTop: 10,
-                marginBottom: 10
-            }}>
+            <div style={{ display: "flex", gap: 10, margin: 10 }}>
 
                 <button onClick={() => setTab("pronos")}>
                     Pronostics
@@ -230,140 +234,83 @@ function App() {
 
             </div>
 
-            {/* ======================
-               PRONOS
-            ====================== */}
+            {/* PRONOS */}
 
             {tab === "pronos" && (
-
-                <pre>
-                    {JSON.stringify(pronos, null, 2)}
-                </pre>
-
+                <pre>{JSON.stringify(pronos, null, 2)}</pre>
             )}
 
-            {/* ======================
-               RAW
-            ====================== */}
+            {/* RAW */}
 
             {tab === "raw" && (
-
-                <pre>
-                    {JSON.stringify(rawMatches, null, 2)}
-                </pre>
-
+                <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
             )}
 
-            {/* ======================
-               SERIES
-            ====================== */}
+            {/* SERIES */}
 
             {tab === "series" && (
 
                 <div style={{ overflowX: "auto" }}>
 
-                    <table>
+                    <table border="1" cellPadding="5">
 
                         <thead>
-
                             <tr>
-
                                 <th>Match</th>
-
-                                <th>Résultat</th>
-
+                                <th>Score</th>
                                 {joueurs.map(j => (
-
                                     <th key={j}>
-                                        {j}
-                                        <br />
+                                        {j}<br />
                                         {totals[j]}
                                     </th>
-
                                 ))}
-
                             </tr>
-
                         </thead>
 
                         <tbody>
 
                             {matches.map(id => {
 
-                                const real =
-                                    rawMatches[id] || {};
+                                const real = rawMatches[id] || {};
 
                                 return (
-
                                     <tr key={id}>
 
                                         <td>
-
-                                            <strong>{id}</strong>
-
-                                            <br />
-
-                                            {real.teamA || "TBD"}
-                                            {" vs "}
-                                            {real.teamB || "TBD"}
-
-                                            <br />
-
-                                            {real.status || "-"}
-
+                                            {id}<br />
+                                            {real.teamA} vs {real.teamB}<br />
+                                            {real.status}
                                         </td>
 
-                                        <td>
-
-                                            {real.score || "-"}
-
-                                        </td>
+                                        <td>{real.score || "-"}</td>
 
                                         {joueurs.map(j => {
 
-                                            const prono =
-                                                pronos.find(
-                                                    p =>
-                                                        p.joueur === j &&
-                                                        p.match_id === id
-                                                );
+                                            const prono = pronos.find(
+                                                p =>
+                                                    p.joueur === j &&
+                                                    p.match_id === id
+                                            );
 
-                                            const pts =
-                                                prono
-                                                    ? calculatePoints(
-                                                        prono,
-                                                        real
-                                                    )
-                                                    : 0;
+                                            const pts = prono
+                                                ? calculatePoints(prono, real)
+                                                : 0;
 
                                             return (
-
                                                 <td key={j}>
-
                                                     {prono ? (
                                                         <>
-
-                                                            {prono.gagnant}
-                                                            {" "}
-                                                            {prono.score}
-
+                                                            {prono.gagnant} {prono.score}
                                                             <br />
-
                                                             +{pts}
-
                                                         </>
-                                                    ) : (
-                                                        "-"
-                                                    )}
-
+                                                    ) : "-"}
                                                 </td>
-
                                             );
 
                                         })}
 
                                     </tr>
-
                                 );
 
                             })}
