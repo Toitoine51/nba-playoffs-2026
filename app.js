@@ -1,10 +1,11 @@
-document.getElementById("root").innerHTML = `
-    <div style="
-        background:black;
-        color:white;
-        padding:20px;
-        font-size:30px;
-    ">
-        APP JS OK
-    </div>
-`;
+function App() {
+    return (
+        <div style={{ padding: 20 }}>
+            <h1>NBA APP OK</h1>
+
+            <button>TEST</button>
+        </div>
+    );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
