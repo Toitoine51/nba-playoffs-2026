@@ -1,7 +1,7 @@
 const { useState, useEffect, useMemo } = React;
 
 /* ======================
-   STORAGE
+   STORAGE (SAFE)
 ====================== */
 
 function loadResults() {
@@ -36,8 +36,8 @@ function App() {
     const [tab, setTab] = useState("series");
 
     const [pronos, setPronos] = useState([]);
-    const [results, setResults] = useState(loadResults());
-    const [rawMatches, setRawMatches] = useState(loadMatches());
+    const [results, setResults] = useState({});
+    const [rawMatches, setRawMatches] = useState({}); // 🔥 CLEAN START
 
     const [loading, setLoading] = useState(false);
 
@@ -58,7 +58,7 @@ function App() {
     }, []);
 
     /* ======================
-       SAVE RESULTS
+       SAVE RESULTS (OPTIONAL)
     ====================== */
 
     useEffect(() => {
@@ -111,12 +111,14 @@ function App() {
 
             });
 
-            saveMatches(newResults);
-
+            // update state
             setRawMatches(prev => ({
                 ...prev,
                 ...newResults
             }));
+
+            // persist
+            saveMatches(newResults);
 
         } catch (e) {
             console.error("FETCH ERROR", e);
@@ -155,7 +157,7 @@ function App() {
     };
 
     /* ======================
-       MATCHES
+       MATCHES FIXES
     ====================== */
 
     const matches = [
@@ -190,10 +192,12 @@ function App() {
             t[j] = pronos
                 .filter(p => p.joueur === j)
                 .reduce((sum, p) => {
+
                     return sum + calculatePoints(
                         p,
                         rawMatches[p.match_id]
                     );
+
                 }, 0);
 
         });
@@ -203,7 +207,7 @@ function App() {
     }, [pronos, rawMatches]);
 
     /* ======================
-       RENDER
+       UI
     ====================== */
 
     return (
@@ -240,7 +244,7 @@ function App() {
                 <pre>{JSON.stringify(pronos, null, 2)}</pre>
             )}
 
-            {/* RAW */}
+            {/* RAW MATCHES */}
 
             {tab === "raw" && (
                 <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
@@ -278,8 +282,8 @@ function App() {
 
                                         <td>
                                             {id}<br />
-                                            {real.teamA} vs {real.teamB}<br />
-                                            {real.status}
+                                            {real.teamA || "TBD"} vs {real.teamB || "TBD"}<br />
+                                            {real.status || "-"}
                                         </td>
 
                                         <td>{real.score || "-"}</td>
