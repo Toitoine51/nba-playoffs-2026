@@ -175,8 +175,7 @@ ${lignes}
 CLASSEMENT DU CONCOURS :
 ${classement}
 
-PRONOS DES PARTICIPANTS :
-${pronosDetails}
+
 
 Écris une analyse vivante et engagée, avec un titre accrocheur et des sous-titres. Parle des séries en cours et terminées, des pronos réussis et ratés, et des dynamiques du classement.`;     
    
@@ -433,9 +432,9 @@ ${pronosDetails}
                     <p>• Finale NBA : ×3</p>
 
                     <h3>Exemple</h3>
-                    <p>Antoine pronostique OKC bat LAL 4-2 au 1er tour. Résultat réel : OKC bat LAL 4-2.</p>
+                    <p>Je pronostique OKC bat LAL 4-2 au 1er tour. Résultat réel : OKC bat LAL 4-2.</p>
                     <p>→ +15 (bon gagnant) + 5 (bon perdant) + 15 (bon score) = <strong>35 pts × 1 = 35 pts</strong></p>
-                    <p>Au 2ème tour, Antoine pronostique OKC bat DEN 4-1. Résultat réel : OKC bat MIN 4-2.</p>
+                    <p>Au 2ème tour, Je pronostique OKC bat DEN 4-1. Résultat réel : OKC bat MIN 4-2.</p>
                     <p>→ +15 (bon gagnant) + 0 (mauvais perdant) + 0 (mauvais score) = <strong>15 pts × 1.5 = 22.5 pts</strong></p>
 
                     <h3>Total maximum possible</h3>
