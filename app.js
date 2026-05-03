@@ -125,7 +125,7 @@ function App() {
                 <div style={{ overflowX: "auto", maxHeight: "70vh", overflowY: "auto" }}>
                     <table border="1" cellPadding="5">
                         <thead>
-                            <tr>
+                            <tr style={{ position: "sticky", top: 0 }}>
                                 <th>Match</th>
                                 <th>Joueur</th>
                                 <th>Gagnant</th>
@@ -134,30 +134,48 @@ function App() {
                             </tr>
                         </thead>
                         <tbody>
-                            {[...pronos]
-                                .sort((a, b) => {
+                            {(() => {
+                                const sorted = [...pronos].sort((a, b) => {
                                     if (a.match_id < b.match_id) return -1;
                                     if (a.match_id > b.match_id) return 1;
                                     if (a.joueur < b.joueur) return -1;
                                     if (a.joueur > b.joueur) return 1;
                                     return 0;
-                                })
-                                .map((p, i) => (
-                                    <tr key={i}>
-                                        <td>{p.match_id}</td>
-                                        <td>{p.joueur}</td>
-                                        <td>{p.gagnant}</td>
-                                        <td>{p.perdant}</td>
-                                        <td>{p.score}</td>
-                                    </tr>
-                                ))
-                            }
+                                });
+                                let colorIndex = 0;
+                                let lastMatchId = null;
+                                const colors = ["#1a2740", "#0f172a"];
+                                return sorted.map((p, i) => {
+                                    if (p.match_id !== lastMatchId) {
+                                        colorIndex = 1 - colorIndex;
+                                        lastMatchId = p.match_id;
+                                    }
+                                    return (
+                                        <tr key={i} style={{ background: colors[colorIndex] }}>
+                                            <td>{p.match_id}</td>
+                                            <td>{p.joueur}</td>
+                                            <td>{p.gagnant}</td>
+                                            <td>{p.perdant}</td>
+                                            <td>{p.score}</td>
+                                        </tr>
+                                    );
+                                });
+                            })()}
                         </tbody>
                     </table>
                 </div>
             )}
 
             {tab === "raw" && (
+
+               <thead>
+                   <tr style={{ position: "sticky", top: 0 }}>
+                       <th>Date</th>
+                       <th>Match</th>
+                       <th>Score</th>
+                       <th>Statut</th>
+                   </tr>
+               </thead>
                 <div style={{ overflowX: "auto", maxHeight: "70vh", overflowY: "auto" }}>
                     <table border="1" cellPadding="5">
                         <thead>
