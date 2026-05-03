@@ -36,6 +36,9 @@ function App() {
     const [lastUpdate, setLastUpdate] = useState(null);
     const [series, setSeries] = useState([]);
     const [mapping, setMapping] = useState({});
+    const [article, setArticle] = useState("");
+    const [articleLoading, setArticleLoading] = useState(false);
+    const [articleError, setArticleError] = useState("");
 
     useEffect(() => {
         fetch("./pronos.json?v=1")
@@ -142,6 +145,31 @@ function App() {
 
         return { winsA, winsB, termine, gagnant, perdant, score };
     };
+
+   const buildPrompt = () => {
+        const lignes = series.map(s => {
+            const sc = calcSerie(s);
+            const statut = sc.termine
+                ? `TERMINÉE : ${sc.gagnant} bat ${sc.perdant} ${sc.score}`
+                : `En cours : ${s.team_a} ${sc.winsA}-${sc.winsB} ${s.team_b}`;
+            return `- ${s.id} (${s.conf}) : ${statut}`;
+        }).join("\n");
+
+        const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
+
+        return `Tu es un journaliste sportif de L'Équipe. Écris un article de presse en français sur les NBA Playoffs 2026, façon L'Équipe.fr, avec un vrai titre accrocheur et des sous-titres. Utilise ces données :
+         
+         SÉRIES :
+         ${lignes}
+         
+         CLASSEMENT DU CONCOURS DE PRONOS (entre amis) :
+         ${classement}
+         
+         Parle des séries en cours et terminées, et parle aussi des derniers résultats de la ligue de pronos entre potes.
+         Guilhem est supposé être le plus travailleur et au courant sur la NBA. Daude est le plus sachant, historiquement. 
+         Les trois autres n'y connaissent pas grand chose.
+             };
+
 
     const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
 
