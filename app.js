@@ -70,6 +70,26 @@ function App() {
     ====================== */
 
     const fetchResults = async () => {
+    setLoading(true);
+    try {
+        const res = await fetch("https://syncnba.toitoine51.workers.dev/state");
+        const json = await res.json();
+
+        const newMatches = {};
+        (json.events || []).forEach(ev => {
+            newMatches[ev.match_id] = ev;
+        });
+
+        setRawMatches(newMatches);
+        saveMatches(newMatches);
+
+       } catch (e) {
+           console.error("FETCH ERROR", e);
+       }
+       setLoading(false);
+   };
+    /*
+    const fetchResults = async () => {
 
         setLoading(true);
 
@@ -125,7 +145,7 @@ function App() {
         }
 
         setLoading(false);
-    };
+    };*/
 
     /* ======================
        POINTS
