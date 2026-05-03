@@ -167,7 +167,7 @@ function App() {
          
          Parle des séries en cours et terminées, et parle aussi des derniers résultats de la ligue de pronos entre potes.
          Guilhem est supposé être le plus travailleur et au courant sur la NBA. Daude est le plus sachant, historiquement. 
-         Les trois autres n'y connaissent pas grand chose.
+         Les trois autres n'y connaissent pas grand chose.`
              };
 
    const fetchArticle = async () => {
