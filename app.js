@@ -294,7 +294,15 @@ function App() {
                             </tr>
                         </thead>
                         <tbody>
-                            {series.map((s, i) => {
+                            {[...series].sort((a, b) => {
+                                const scoreA = calcSerie(a);
+                                const scoreB = calcSerie(b);
+                                if (!scoreA.termine && scoreB.termine) return -1;
+                                if (scoreA.termine && !scoreB.termine) return 1;
+                                if (a.id > b.id) return -1;
+                                if (a.id < b.id) return 1;
+                                return 0;
+                            }).map((s, i) => {
                                 const serieScore = calcSerie(s);
                                 const coeff = coeffTour(s.id);
                                 const scoreAffiche = `${s.team_a} ${serieScore.winsA}-${serieScore.winsB} ${s.team_b}`;
@@ -343,6 +351,7 @@ function App() {
                     </table>
                 </div>
             )}
+
 
             {tab === "regles" && (
                 <div style={{ padding: 10, maxWidth: 600 }}>
