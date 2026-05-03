@@ -344,7 +344,7 @@ function App() {
                 </div>
             )}
 
-            {tab === "regles" && (
+            {tab === "Calcul des points" && (
                 <div style={{ padding: 10, maxWidth: 600 }}>
                     <h2>Calcul des points</h2>
                     <p>Chaque joueur pronostique le gagnant, le perdant et le score de chaque série avant le début des playoffs.</p>
