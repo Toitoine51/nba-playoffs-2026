@@ -301,9 +301,25 @@ function App() {
                                                 <td key={j}>
                                                     {prono ? (
                                                         <>
-                                                            {prono.gagnant} {prono.score} {prono.perdant}
-                                                            <br />
-                                                            +{pts}
+
+                                               {prono.gagnant} {prono.score} {prono.perdant}
+                                                   <br />
+                                                   {serieScore.termine ? (
+                                                       <>
+                                                           <span style={{ color: prono.gagnant === serieScore.gagnant ? "#00ff9d" : "#ff4444" }}>
+                                                               {prono.gagnant === serieScore.gagnant ? "+10g" : "+0g"}
+                                                           </span>
+                                                           {" "}
+                                                           <span style={{ color: prono.gagnant === serieScore.gagnant && prono.perdant === serieScore.perdant ? "#00ff9d" : "#ff4444" }}>
+                                                               {prono.gagnant === serieScore.gagnant && prono.perdant === serieScore.perdant ? "+10p" : "+0p"}
+                                                           </span>
+                                                           {" "}
+                                                           <span style={{ color: prono.gagnant === serieScore.gagnant && prono.score === serieScore.score ? "#00ff9d" : "#ff4444" }}>
+                                                               {prono.gagnant === serieScore.gagnant && prono.score === serieScore.score ? "+10s" : "+0s"}
+                                                           </span>
+                                                       </>
+                                                   ) : "-"}
+                                               
                                                         </>
                                                     ) : "-"}
                                                 </td>
