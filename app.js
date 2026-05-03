@@ -35,15 +35,17 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [lastUpdate, setLastUpdate] = useState(null);
 
-    useEffect(() => {
-        fetch("./pronos.json?v=1")
-            .then(r => r.json())
-            .then(data => setPronos(data))
-            .catch(err => {
-                console.error("PRONOS ERROR", err);
-                setPronos([]);
-            });
-    }, []);
+   useEffect(() => {
+       fetch("./pronos.json?v=1")
+           .then(r => r.json())
+           .then(data => setPronos(data))
+           .catch(err => {
+               console.error("PRONOS ERROR", err);
+               setPronos([]);
+           });
+   
+       fetchResults();
+   }, []);
 
     useEffect(() => {
         saveResults(results);
