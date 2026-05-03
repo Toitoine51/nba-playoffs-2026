@@ -157,7 +157,16 @@ function App() {
 
         const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
 
-        return `Tu es un journaliste sportif de L'Équipe. Écris un article de presse en français sur les NBA Playoffs 2026, façon L'Équipe.fr, avec un vrai titre accrocheur et des sous-titres. Utilise ces données :
+        return `Tu es un journaliste sportif de L'Équipe. 
+        Tu dois écrire un article sur un concours de pronostics NBA sur les playoffs de 2026. 
+        
+        Il y a 5 participants. Tu peux utiliser les informations suivantes, mais sans trop insister non plus: 
+        * Guilhem est supposé être le plus travailleur et au courant sur la NBA sur les 5 dernieres années. Il utilise beaucoup son appli NBA pour regarder les matchs. 
+        * Daude est le plus sachant, historiquement. 
+        * Ousset et Jeff sont très forts en football. 
+        * Antoine n'y connait pas grand chose. 
+
+        Ensuite, tu as les résultats des matchs, des séries et aussi les pronos des participants.
          
          SÉRIES :
          ${lignes}
@@ -165,9 +174,9 @@ function App() {
          CLASSEMENT DU CONCOURS DE PRONOS (entre amis) :
          ${classement}
          
-         Parle des séries en cours et terminées, et parle aussi des derniers résultats de la ligue de pronos entre potes.
-         Guilhem est supposé être le plus travailleur et au courant sur la NBA. Daude est le plus sachant, historiquement. 
-         Les trois autres n'y connaissent pas grand chose.`
+         Enfin, je te rappelle que l'article est davantage tourné sur le concours de pronostics que les résultats des matchs. 
+         Oui, nous avons besoin que tu parles du résultats des matchs, mais le plus important c'est le concours de pronostics: les paris, les erreurs, les bons coups ...
+             `
              };
 
    const fetchArticle = async () => {
