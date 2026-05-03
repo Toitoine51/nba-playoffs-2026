@@ -122,7 +122,39 @@ function App() {
             </div>
 
             {tab === "pronos" && (
-                <pre>{JSON.stringify(pronos, null, 2)}</pre>
+                <div style={{ overflowX: "auto", maxHeight: "70vh", overflowY: "auto" }}>
+                    <table border="1" cellPadding="5">
+                        <thead>
+                            <tr>
+                                <th>Match</th>
+                                <th>Joueur</th>
+                                <th>Gagnant</th>
+                                <th>Perdant</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[...pronos]
+                                .sort((a, b) => {
+                                    if (a.match_id < b.match_id) return -1;
+                                    if (a.match_id > b.match_id) return 1;
+                                    if (a.joueur < b.joueur) return -1;
+                                    if (a.joueur > b.joueur) return 1;
+                                    return 0;
+                                })
+                                .map((p, i) => (
+                                    <tr key={i}>
+                                        <td>{p.match_id}</td>
+                                        <td>{p.joueur}</td>
+                                        <td>{p.gagnant}</td>
+                                        <td>{p.perdant}</td>
+                                        <td>{p.score}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
             )}
 
             {tab === "raw" && (
