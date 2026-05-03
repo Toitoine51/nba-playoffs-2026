@@ -217,7 +217,7 @@ function App() {
             <h1>NBA PLAYOFFS 2026</h1>
 
             <button onClick={fetchResults}>
-                {loading ? "Loading..." : "Fetch 3 jours"}
+                {loading ? "Loading..." : "charger les derniers résultats"}
             </button>
 
             {/* TABS */}
