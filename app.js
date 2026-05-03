@@ -180,19 +180,21 @@ function App() {
                         <tbody>
                             {Object.values(rawMatches)
                                 .sort((a, b) => new Date(b.date) - new Date(a.date))
-                                .map(m => (
-                                    <tr key={m.match_id}>
-                                        <td>{new Date(m.date).toLocaleDateString("fr-FR")}</td>
-                                        <td>{m.team_a} vs {m.team_b}</td>
-                                        <td>{m.score}</td>
-                                        <td>{m.status}</td>
-                                    </tr>
-                                ))
+                                .map((m, i) => (
+                                  <tr key={m.match_id} style={{ background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>
+                                      <td>{new Date(m.date).toLocaleDateString("fr-FR")}</td>
+                                      <td>{m.team_a} vs {m.team_b}</td>
+                                      <td>{m.score}</td>
+                                      <td>{m.status}</td>
+                                  </tr>
+                              ))
                             }
                         </tbody>
                     </table>
                 </div>
             )}
+
+
             {tab === "series" && (
                 <div style={{ overflowX: "auto" }}>
                     <table border="1" cellPadding="5">
