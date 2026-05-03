@@ -435,8 +435,6 @@ function App() {
                 </div>
             )}
 
-        </div>
-    );
 
     {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
@@ -451,6 +449,10 @@ function App() {
                     )}
                 </div>
             )}
+
+        </div>
+    );
+
 }
 
 ReactDOM
