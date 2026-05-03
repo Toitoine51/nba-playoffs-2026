@@ -82,22 +82,30 @@ function App() {
         setLoading(false);
     };
 
+    const coeffTour = (matchId) => {
+        if (matchId.startsWith("R1")) return 1;
+        if (matchId.startsWith("R2")) return 1.5;
+        if (matchId.startsWith("R3")) return 2;
+        if (matchId.startsWith("R4")) return 3;
+        return 1;
+    };
 
-   const calculatePoints = (prono, serieScore) => {
-       if (!serieScore) return 0;
-       if (!serieScore.termine) return 0;
-       let pts = 0;
-       if (prono.gagnant === serieScore.gagnant) {
-           pts += 10;
-           if (prono.perdant === serieScore.perdant) {
-               pts += 10;
-           }
-           if (prono.score === serieScore.score) {
-               pts += 10;
-           }
-       }
-       return pts;
-   };
+    const calculatePoints = (prono, serieScore) => {
+        if (!serieScore) return 0;
+        if (!serieScore.termine) return 0;
+        const coeff = coeffTour(prono.match_id);
+        let pts = 0;
+        if (prono.gagnant === serieScore.gagnant) {
+            pts += 15;
+            if (prono.perdant === serieScore.perdant) {
+                pts += 5;
+            }
+            if (prono.score === serieScore.score) {
+                pts += 15;
+            }
+        }
+        return pts * coeff;
+    };
 
     const calcSerie = (serie) => {
         const normalize = (abbr) => mapping[abbr] || abbr;
@@ -131,7 +139,7 @@ function App() {
         const gagnant = winsA === 4 ? serie.team_a : winsB === 4 ? serie.team_b : null;
         const perdant = winsA === 4 ? serie.team_b : winsB === 4 ? serie.team_a : null;
         const score = termine ? `${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}` : null;
-        
+
         return { winsA, winsB, termine, gagnant, perdant, score };
     };
 
@@ -166,6 +174,7 @@ function App() {
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
                     <button onClick={() => setTab("scoreSeries")}>Score des séries</button>
                     <button onClick={() => setTab("series")}>Classement pronos</button>
+                    <button onClick={() => setTab("regles")}>Calcul des points</button>
                 </div>
             </div>
 
@@ -280,13 +289,14 @@ function App() {
                                 <th>Série</th>
                                 <th>Score</th>
                                 {joueursTries.map(j => (
-                                    <th key={j}>{j}<br />{totals[j]}</th>
+                                    <th key={j}>{j}<br /><span style={{ color: "#c8102e", fontWeight: "bold" }}>{totals[j]}</span></th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {series.map((s, i) => {
                                 const serieScore = calcSerie(s);
+                                const coeff = coeffTour(s.id);
                                 const scoreAffiche = `${s.team_a} ${serieScore.winsA}-${serieScore.winsB} ${s.team_b}`;
                                 return (
                                     <tr key={s.id} style={{ background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>
@@ -297,29 +307,30 @@ function App() {
                                                 p => p.joueur === j && p.match_id === s.id
                                             );
                                             const pts = prono ? calculatePoints(prono, serieScore) : 0;
+                                            const bonGagnant = prono && prono.gagnant === serieScore.gagnant;
+                                            const bonPerdant = bonGagnant && prono.perdant === serieScore.perdant;
+                                            const bonScore = bonGagnant && prono.score === serieScore.score;
                                             return (
                                                 <td key={j}>
                                                     {prono ? (
                                                         <>
-
-                                               {prono.gagnant} {prono.score} {prono.perdant}
-                                                   <br />
-                                                   {serieScore.termine ? (
-                                                       <>
-                                                           <span style={{ color: prono.gagnant === serieScore.gagnant ? "#00ff9d" : "#ff4444" }}>
-                                                               {prono.gagnant === serieScore.gagnant ? "+10g" : "+0g"}
-                                                           </span>
-                                                           {" "}
-                                                           <span style={{ color: prono.gagnant === serieScore.gagnant && prono.perdant === serieScore.perdant ? "#00ff9d" : "#ff4444" }}>
-                                                               {prono.gagnant === serieScore.gagnant && prono.perdant === serieScore.perdant ? "+10p" : "+0p"}
-                                                           </span>
-                                                           {" "}
-                                                           <span style={{ color: prono.gagnant === serieScore.gagnant && prono.score === serieScore.score ? "#00ff9d" : "#ff4444" }}>
-                                                               {prono.gagnant === serieScore.gagnant && prono.score === serieScore.score ? "+10s" : "+0s"}
-                                                           </span>
-                                                       </>
-                                                   ) : "-"}
-                                               
+                                                            {prono.gagnant} {prono.score} {prono.perdant}
+                                                            <br />
+                                                            {serieScore.termine ? (
+                                                                <>
+                                                                    <span style={{ color: bonGagnant ? "#00ff9d" : "#ff4444" }}>
+                                                                        {bonGagnant ? `+${15 * coeff}g` : "+0g"}
+                                                                    </span>
+                                                                    {" "}
+                                                                    <span style={{ color: bonPerdant ? "#00ff9d" : "#ff4444" }}>
+                                                                        {bonPerdant ? `+${5 * coeff}p` : "+0p"}
+                                                                    </span>
+                                                                    {" "}
+                                                                    <span style={{ color: bonScore ? "#00ff9d" : "#ff4444" }}>
+                                                                        {bonScore ? `+${15 * coeff}s` : "+0s"}
+                                                                    </span>
+                                                                </>
+                                                            ) : "-"}
                                                         </>
                                                     ) : "-"}
                                                 </td>
@@ -333,6 +344,38 @@ function App() {
                 </div>
             )}
 
+            {tab === "regles" && (
+                <div style={{ padding: 10, maxWidth: 600 }}>
+                    <h2>Calcul des points</h2>
+                    <p>Chaque joueur pronostique le gagnant, le perdant et le score de chaque série avant le début des playoffs.</p>
+
+                    <h3>Points de base</h3>
+                    <p>• Bon gagnant : +15 pts</p>
+                    <p>• Bon perdant : +5 pts</p>
+                    <p>• Score exact : +15 pts</p>
+                    <p>Le total de points est multiplié par le coefficient du tour.</p>
+
+                    <h3>Coefficients par tour</h3>
+                    <p>• 1er tour : ×1</p>
+                    <p>• 2ème tour (demi-finale de conférence) : ×1.5</p>
+                    <p>• 3ème tour (finale de conférence) : ×2</p>
+                    <p>• Finale NBA : ×3</p>
+
+                    <h3>Exemple</h3>
+                    <p>Antoine pronostique OKC bat LAL 4-2 au 1er tour. Résultat réel : OKC bat LAL 4-2.</p>
+                    <p>→ +15 (bon gagnant) + 5 (bon perdant) + 15 (bon score) = <strong>35 pts × 1 = 35 pts</strong></p>
+                    <p>Au 2ème tour, Antoine pronostique OKC bat DEN 4-1. Résultat réel : OKC bat MIN 4-2.</p>
+                    <p>→ +15 (bon gagnant) + 0 (mauvais perdant) + 0 (mauvais score) = <strong>15 pts × 1.5 = 22.5 pts</strong></p>
+
+                    <h3>Total maximum possible</h3>
+                    <p>• 1er tour (×1) — 8 séries : 280 pts</p>
+                    <p>• 2ème tour (×1.5) — 4 séries : 210 pts</p>
+                    <p>• 3ème tour (×2) — 2 séries : 140 pts</p>
+                    <p>• Finale (×3) — 1 série : 105 pts</p>
+                    <p><strong>Total maximum : 735 pts</strong></p>
+                </div>
+            )}
+
         </div>
     );
 }
@@ -340,3 +383,5 @@ function App() {
 ReactDOM
     .createRoot(document.getElementById("root"))
     .render(<App />);
+
+
