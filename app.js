@@ -1,6 +1,3 @@
-Le problème est ligne 2 — tu as mis `const [lastUpdate, setLastUpdate] = useState(null);` **en dehors** de la fonction `App()`. Il doit être à l'intérieur. Voici le fichier corrigé :
-
-```js
 const { useState, useEffect, useMemo } = React;
 
 /* ======================
@@ -185,4 +182,3 @@ function App() {
 ReactDOM
     .createRoot(document.getElementById("root"))
     .render(<App />);
-```
