@@ -169,7 +169,7 @@ function App() {
                     <table border="1" cellPadding="5">
                         <thead>
                             <tr style={{ position: "sticky", top: 0 }}>
-                                <th>Match</th>
+                                <th>Série</th>
                                 <th>Joueur</th>
                                 <th>Gagnant</th>
                                 <th>Perdant</th>
