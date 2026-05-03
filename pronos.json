@@ -33,24 +33,24 @@
   },
   {
     "joueur": "Jeff",
-    "tour": "CS",
-    "match_id": "CS-O1",
+    "tour": "R2",
+    "match_id": "R2-O1",
     "gagnant": "OKC",
     "perdant": "LAL",
     "score": "4-3"
   },
   {
     "joueur": "Jeff",
-    "tour": "CS",
-    "match_id": "CS-O2",
+    "tour": "R2",
+    "match_id": "R2-O2",
     "gagnant": "SAS",
     "perdant": "DEN",
     "score": "4-3"
   },
   {
     "joueur": "Jeff",
-    "tour": "CF",
-    "match_id": "CF-O",
+    "tour": "R3",
+    "match_id": "R3-01",
     "gagnant": "SAS",
     "perdant": "OKC",
     "score": "4-3"
@@ -89,32 +89,32 @@
   },
   {
     "joueur": "Jeff",
-    "tour": "CS",
-    "match_id": "CS-E1",
+    "tour": "R2",
+    "match_id": "R2-03",
     "gagnant": "DET",
     "perdant": "CLE",
     "score": "4-3"
   },
   {
     "joueur": "Jeff",
-    "tour": "CS",
-    "match_id": "CS-E2",
+    "tour": "R2",
+    "match_id": "R2-04",
     "gagnant": "BOS",
     "perdant": "NYK",
     "score": "4-3"
   },
   {
     "joueur": "Jeff",
-    "tour": "CF",
-    "match_id": "CF-E",
+    "tour": "R3",
+    "match_id": "R3-02",
     "gagnant": "DET",
     "perdant": "BOS",
     "score": "4-3"
   },
   {
     "joueur": "Jeff",
-    "tour": "FINALS",
-    "match_id": "FINALS-1",
+    "tour": "R4",
+    "match_id": "R4-01",
     "gagnant": "SAS",
     "perdant": "DET",
     "score": "4-3"
@@ -154,24 +154,24 @@
   },
   {
     "joueur": "Ousset",
-    "tour": "CS",
-    "match_id": "CS-O1",
+    "tour": "R2",
+    "match_id": "R2-O1",
     "gagnant": "OKC",
     "perdant": "HOU",
     "score": "4-1"
   },
   {
     "joueur": "Ousset",
-    "tour": "CS",
-    "match_id": "CS-O2",
+    "tour": "R2",
+    "match_id": "R2-O2",
     "gagnant": "SAS",
     "perdant": "DEN",
     "score": "4-1"
   },
   {
     "joueur": "Ousset",
-    "tour": "CF",
-    "match_id": "CF-O",
+    "tour": "R3",
+    "match_id": "R3-01",
     "gagnant": "SAS",
     "perdant": "OKC",
     "score": "4-2"
@@ -210,32 +210,32 @@
   },
   {
     "joueur": "Ousset",
-    "tour": "CS",
-    "match_id": "CS-E1",
+    "tour": "R2",
+    "match_id": "R2-03",
     "gagnant": "DET",
     "perdant": "CLE",
     "score": "4-3"
   },
   {
     "joueur": "Ousset",
-    "tour": "CS",
-    "match_id": "CS-E2",
+    "tour": "R2",
+    "match_id": "R2-04",
     "gagnant": "NYK",
     "perdant": "BOS",
     "score": "4-2"
   },
   {
     "joueur": "Ousset",
-    "tour": "CF",
-    "match_id": "CF-E",
+    "tour": "R3",
+    "match_id": "R3-02",
     "gagnant": "NYK",
     "perdant": "DET",
     "score": "4-2"
   },
   {
     "joueur": "Ousset",
-    "tour": "FINALS",
-    "match_id": "FINALS-1",
+    "tour": "R4",
+    "match_id": "R4-01",
     "gagnant": "SAS",
     "perdant": "NYK",
     "score": "4-1"
@@ -275,24 +275,24 @@
   },
   {
     "joueur": "Antoine",
-    "tour": "CS",
-    "match_id": "CS-O1",
+    "tour": "R2",
+    "match_id": "R2-O1",
     "gagnant": "OKC",
     "perdant": "HOU",
     "score": "4-1"
   },
   {
     "joueur": "Antoine",
-    "tour": "CS",
-    "match_id": "CS-O2",
+    "tour": "R2",
+    "match_id": "R2-O2",
     "gagnant": "DEN",
     "perdant": "SAS",
     "score": "4-3"
   },
   {
     "joueur": "Antoine",
-    "tour": "CF",
-    "match_id": "CF-O",
+    "tour": "R3",
+    "match_id": "R3-01",
     "gagnant": "OKC",
     "perdant": "DEN",
     "score": "4-3"
@@ -331,32 +331,32 @@
   },
   {
     "joueur": "Antoine",
-    "tour": "CS",
-    "match_id": "CS-E1",
+    "tour": "R2",
+    "match_id": "R2-03",
     "gagnant": "DET",
     "perdant": "CLE",
     "score": "4-3"
   },
   {
     "joueur": "Antoine",
-    "tour": "CS",
-    "match_id": "CS-E2",
+    "tour": "R2",
+    "match_id": "R2-04",
     "gagnant": "NYK",
     "perdant": "BOS",
     "score": "4-3"
   },
   {
     "joueur": "Antoine",
-    "tour": "CF",
-    "match_id": "CF-E",
+    "tour": "R3",
+    "match_id": "R3-02",
     "gagnant": "DET",
     "perdant": "NYK",
     "score": "4-1"
   },
   {
     "joueur": "Antoine",
-    "tour": "FINALS",
-    "match_id": "FINALS-1",
+    "tour": "R4",
+    "match_id": "R4-01",
     "gagnant": "OKC",
     "perdant": "DET",
     "score": "4-2"
@@ -373,8 +373,8 @@
   { "joueur": "daude", "tour": "R2", "match_id": "R2-O2", "gagnant": "DEN", "perdant": "SAS", "score": "4-3" },
   { "joueur": "daude", "tour": "R2", "match_id": "R2-O3", "gagnant": "CLE", "perdant": "DET", "score": "4-2" },
   { "joueur": "daude", "tour": "R2", "match_id": "R2-O4", "gagnant": "NYK", "perdant": "BOS", "score": "4-3" },
-  { "joueur": "daude", "tour": "R3", "match_id": "R3-O1", "gagnant": "DEN", "perdant": "OKC", "score": "4-2" },
-  { "joueur": "daude", "tour": "R3", "match_id": "R3-O2", "gagnant": "NYK", "perdant": "CLE", "score": "4-2" },
+  { "joueur": "daude", "tour": "R3", "match_id": "R3-01", "gagnant": "DEN", "perdant": "OKC", "score": "4-2" },
+  { "joueur": "daude", "tour": "R3", "match_id": "R3-02", "gagnant": "NYK", "perdant": "CLE", "score": "4-2" },
   { "joueur": "daude", "tour": "R4", "match_id": "R4-O1", "gagnant": "DEN", "perdant": "NYK", "score": "4-1" },
   { "joueur": "guilhem", "tour": "R1", "match_id": "R1-O1", "gagnant": "OKC", "perdant": "LAC", "score": "4-2" },
   { "joueur": "guilhem", "tour": "R1", "match_id": "R1-O2", "gagnant": "HOU", "perdant": "LAL", "score": "4-2" },
@@ -388,7 +388,7 @@
   { "joueur": "guilhem", "tour": "R2", "match_id": "R2-O2", "gagnant": "DEN", "perdant": "SAS", "score": "4-2" },
   { "joueur": "guilhem", "tour": "R2", "match_id": "R2-O3", "gagnant": "CLE", "perdant": "DET", "score": "4-3" },
   { "joueur": "guilhem", "tour": "R2", "match_id": "R2-O4", "gagnant": "NYK", "perdant": "BOS", "score": "4-2" },
-  { "joueur": "guilhem", "tour": "R3", "match_id": "R3-O1", "gagnant": "DEN", "perdant": "OKC", "score": "4-3" },
-  { "joueur": "guilhem", "tour": "R3", "match_id": "R3-O2", "gagnant": "CLE", "perdant": "NYK", "score": "4-1" },
+  { "joueur": "guilhem", "tour": "R3", "match_id": "R3-01", "gagnant": "DEN", "perdant": "OKC", "score": "4-3" },
+  { "joueur": "guilhem", "tour": "R3", "match_id": "R3-02", "gagnant": "CLE", "perdant": "NYK", "score": "4-1" },
   { "joueur": "guilhem", "tour": "R4", "match_id": "R4-O1", "gagnant": "DEN", "perdant": "CLE", "score": "4-2" }
 ]
