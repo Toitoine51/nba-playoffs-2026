@@ -111,6 +111,7 @@ function App() {
         <div style={{ padding: 10, fontFamily: "Arial" }}>
 
             <h1>NBA PLAYOFFS 2026 t1</h1>
+            {loading && <p style={{ textAlign: "center", color: "#fbbf24" }}>Chargement...</p>}
 
             <div style={{ margin: 10 }}>
                 <div style={{ display: "flex", gap: 10 }}>
