@@ -249,7 +249,7 @@ function App() {
                 </button>
 
                 <button onClick={() => setTab("raw")}>
-                    Résultats bruts
+                    Score des matchs
                 </button>
 
                 <button onClick={() => setTab("series")}>
