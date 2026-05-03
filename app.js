@@ -157,27 +157,30 @@ function App() {
 
         const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
 
-        return `Tu es un journaliste sportif de L'Équipe. 
-        Tu dois écrire un article sur un concours de pronostics NBA sur les playoffs de 2026. 
-        
-        Il y a 5 participants. Tu peux utiliser les informations suivantes, mais sans trop insister non plus: 
-        * Guilhem est supposé être le plus travailleur et au courant sur la NBA sur les 5 dernieres années. Il utilise beaucoup son appli NBA pour regarder les matchs. 
-        * Daude est le plus sachant, historiquement. 
-        * Ousset et Jeff sont très forts en football. 
-        * Antoine n'y connait pas grand chose. 
+   return `Nous sommes le ${new Date().toLocaleDateString("fr-FR")}.
 
-        Ensuite, tu as les résultats des matchs, des séries et aussi les pronos des participants.
-         
-         SÉRIES :
-         ${lignes}
-         
-         CLASSEMENT DU CONCOURS DE PRONOS (entre amis) :
-         ${classement}
-         
-         Enfin, je te rappelle que l'article est davantage tourné sur le concours de pronostics que les résultats des matchs. 
-         Oui, nous avons besoin que tu parles du résultats des matchs, mais le plus important c'est le concours de pronostics: les paris, les erreurs, les bons coups ...
-             `
-             };
+Tu es un analyste sportif passionné. Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 5 amis.
+
+Il y a 5 participants, voici quelques infos sur eux (à utiliser avec subtilité, pas besoin d'en parler pour chaque série) :
+- Guilhem suit la NBA depuis 5 ans, très assidu, utilise l'app NBA au quotidien
+- Daude est le plus expérimenté historiquement
+- Ousset et Jeff sont plutôt des footeux
+- Antoine est le néophyte du groupe
+
+L'analyse doit être centrée sur le concours de pronos : les bons coups, les erreurs, les surprises, qui est en forme, qui se plante. Les résultats des matchs sont là pour donner du contexte, pas pour être le sujet principal.
+
+RÉSULTATS DES SÉRIES :
+${lignes}
+
+CLASSEMENT DU CONCOURS :
+${classement}
+
+PRONOS DES PARTICIPANTS :
+${pronosDetails}
+
+Écris une analyse vivante et engagée, avec un titre accrocheur et des sous-titres. Parle des séries en cours et terminées, des pronos réussis et ratés, et des dynamiques du classement.`;     
+   
+   };
 
    const fetchArticle = async () => {
         setArticleLoading(true);
