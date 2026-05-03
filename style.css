@@ -33,7 +33,7 @@ button:hover {
 }
 
 /* TAB BAR */
-div {
+*, *::before, *::after {
     box-sizing: border-box;
 }
 
