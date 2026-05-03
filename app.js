@@ -52,6 +52,11 @@ function App() {
     const fetchResults = async () => {
         setLoading(true);
         try {
+           
+            // 1. Synchronise ESPN → KV
+            await fetch("https://syncnba.toitoine51.workers.dev/");
+
+            // 2. Lit le KV et affiche
             const res = await fetch("https://syncnba.toitoine51.workers.dev/state");
             const json = await res.json();
             const newMatches = {};
