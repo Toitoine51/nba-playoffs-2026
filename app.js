@@ -128,9 +128,6 @@ function App() {
                 <pre>{JSON.stringify(pronos, null, 2)}</pre>
             )}
 
-            /*{tab === "raw" && (
-                <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
-            )}*/
             {tab === "raw" && (
                 <div style={{ overflowX: "auto", maxHeight: "70vh", overflowY: "auto" }}>
                     <table border="1" cellPadding="5">
