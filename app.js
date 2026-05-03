@@ -82,18 +82,22 @@ function App() {
         setLoading(false);
     };
 
-    const calculatePoints = (prono, serieScore) => {
-        if (!serieScore) return 0;
-        if (!serieScore.termine) return 0;
-        let pts = 0;
-        if (prono.gagnant === serieScore.gagnant) {
-            pts += 10;
-            if (prono.score === serieScore.score) {
-                pts += 10;
-            }
-        }
-        return pts;
-    };
+
+   const calculatePoints = (prono, serieScore) => {
+       if (!serieScore) return 0;
+       if (!serieScore.termine) return 0;
+       let pts = 0;
+       if (prono.gagnant === serieScore.gagnant) {
+           pts += 10;
+           if (prono.perdant === serieScore.perdant) {
+               pts += 10;
+           }
+           if (prono.score === serieScore.score) {
+               pts += 10;
+           }
+       }
+       return pts;
+   };
 
     const calcSerie = (serie) => {
         const normalize = (abbr) => mapping[abbr] || abbr;
@@ -125,9 +129,10 @@ function App() {
 
         const termine = winsA === 4 || winsB === 4;
         const gagnant = winsA === 4 ? serie.team_a : winsB === 4 ? serie.team_b : null;
+        const perdant = winsA === 4 ? serie.team_b : winsB === 4 ? serie.team_a : null;
         const score = termine ? `${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}` : null;
-
-        return { winsA, winsB, termine, gagnant, score };
+        
+        return { winsA, winsB, termine, gagnant, perdant, score };
     };
 
     const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
