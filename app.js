@@ -160,7 +160,7 @@ function App() {
                     <button onClick={() => setTab("pronos")}>Pronostics</button>
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
                     <button onClick={() => setTab("scoreSeries")}>Score des séries</button>
-                    <button onClick={() => setTab("series")}>Séries</button>
+                    <button onClick={() => setTab("series")}>Classement pronos</button>
                 </div>
             </div>
 
