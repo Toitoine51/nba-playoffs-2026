@@ -231,109 +231,79 @@ function App() {
     ====================== */
 
     return (
+    <div style={{ padding: 10, fontFamily: "Arial" }}>
+
+        <h1>NBA PLAYOFFS 2026</h1>
 
         <div style={{ display: "flex", gap: 10, margin: 10 }}>
-             <button onClick={() => setTab("pronos")}>Pronostics</button>
-             <button onClick={() => setTab("raw")}>Score des matchs</button>
-             <button onClick={fetchResults}>
-                 {loading ? "Loading..." : "Mettre à jour"}
-             </button>
-             <button onClick={() => setTab("series")}>Séries</button>
-         </div>
-
-            {/* PRONOS */}
-
-            {tab === "pronos" && (
-                <pre>{JSON.stringify(pronos, null, 2)}</pre>
-            )}
-
-            {/* RAW MATCHES */}
-
-            {tab === "raw" && (
-                <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
-            )}
-
-            {/* SERIES */}
-
-            {tab === "series" && (
-
-                <div style={{ overflowX: "auto" }}>
-
-                    <table border="1" cellPadding="5">
-
-                        <thead>
-                            <tr>
-                                <th>Match</th>
-                                <th>Score</th>
-                                {joueurs.map(j => (
-                                    <th key={j}>
-                                        {j}<br />
-                                        {totals[j]}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            {matches.map(id => {
-
-                                const real = rawMatches[id] || {};
-
-                                return (
-                                    <tr key={id}>
-
-                                        <td>
-                                            {id}<br />
-                                            {real.teamA || "TBD"} vs {real.teamB || "TBD"}<br />
-                                            {real.status || "-"}
-                                        </td>
-
-                                        <td>{real.score || "-"}</td>
-
-                                        {joueurs.map(j => {
-
-                                            const prono = pronos.find(
-                                                p =>
-                                                    p.joueur === j &&
-                                                    p.match_id === id
-                                            );
-
-                                            const pts = prono
-                                                ? calculatePoints(prono, real)
-                                                : 0;
-
-                                            return (
-                                                <td key={j}>
-                                                    {prono ? (
-                                                        <>
-                                                            {prono.gagnant} {prono.score}
-                                                            <br />
-                                                            +{pts}
-                                                        </>
-                                                    ) : "-"}
-                                                </td>
-                                            );
-
-                                        })}
-
-                                    </tr>
-                                );
-
-                            })}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            )}
-
+            <button onClick={() => setTab("pronos")}>Pronostics</button>
+            <button onClick={() => setTab("raw")}>Score des matchs</button>
+            <button onClick={fetchResults}>
+                {loading ? "Loading..." : "Mettre à jour"}
+            </button>
+            <button onClick={() => setTab("series")}>Séries</button>
         </div>
 
-    );
+        {tab === "pronos" && (
+            <pre>{JSON.stringify(pronos, null, 2)}</pre>
+        )}
 
+        {tab === "raw" && (
+            <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
+        )}
+
+        {tab === "series" && (
+            <div style={{ overflowX: "auto" }}>
+                <table border="1" cellPadding="5">
+                    <thead>
+                        <tr>
+                            <th>Match</th>
+                            <th>Score</th>
+                            {joueurs.map(j => (
+                                <th key={j}>{j}<br />{totals[j]}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {matches.map(id => {
+                            const real = rawMatches[id] || {};
+                            return (
+                                <tr key={id}>
+                                    <td>
+                                        {id}<br />
+                                        {real.teamA || "TBD"} vs {real.teamB || "TBD"}<br />
+                                        {real.status || "-"}
+                                    </td>
+                                    <td>{real.score || "-"}</td>
+                                    {joueurs.map(j => {
+                                        const prono = pronos.find(
+                                            p => p.joueur === j && p.match_id === id
+                                        );
+                                        const pts = prono ? calculatePoints(prono, real) : 0;
+                                        return (
+                                            <td key={j}>
+                                                {prono ? (
+                                                    <>
+                                                        {prono.gagnant} {prono.score}
+                                                        <br />
+                                                        +{pts}
+                                                    </>
+                                                ) : "-"}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        )}
+
+    </div>
+);
+   
+    
 }
 
 ReactDOM
