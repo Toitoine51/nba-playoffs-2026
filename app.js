@@ -174,7 +174,7 @@ function App() {
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
                     <button onClick={() => setTab("scoreSeries")}>Score des séries</button>
                     <button onClick={() => setTab("series")}>Classement pronos</button>
-                    <button onClick={() => setTab("regles")}>Calcul des points</button>
+                    <button onClick={() => setTab("Calcul des points")}>Calcul des points</button>
                 </div>
             </div>
 
@@ -344,7 +344,7 @@ function App() {
                 </div>
             )}
 
-            {tab === "Calcul des points" && (
+            {tab === "regles" && (
                 <div style={{ padding: 10, maxWidth: 600 }}>
                     <h2>Calcul des points</h2>
                     <p>Chaque joueur pronostique le gagnant, le perdant et le score de chaque série avant le début des playoffs.</p>
