@@ -170,6 +170,27 @@ function App() {
          Les trois autres n'y connaissent pas grand chose.
              };
 
+   const fetchArticle = async () => {
+        setArticleLoading(true);
+        setArticleError("");
+        setArticle("");
+        try {
+            const res = await fetch("https://gemini.toitoine51.workers.dev/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: buildPrompt() })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                setArticle(json.text);
+            } else {
+                setArticleError("Erreur Gemini : " + json.error);
+            }
+        } catch (e) {
+            setArticleError("Erreur réseau : " + e.message);
+        }
+        setArticleLoading(false);
+    };
 
     const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
 
@@ -202,6 +223,7 @@ function App() {
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
                     <button onClick={() => setTab("scoreSeries")}>Score des séries</button>
                     <button onClick={() => setTab("series")}>Classement pronos</button>
+                    <button onClick={() => setTab("article")}>Analyse des résultats </button>
                     <button onClick={() => setTab("regles")}>Calcul des points</button>
                 </div>
             </div>
@@ -415,6 +437,20 @@ function App() {
 
         </div>
     );
+
+    {tab === "article" && (
+                <div style={{ padding: 10, maxWidth: 700 }}>
+                    <button onClick={fetchArticle} disabled={articleLoading} style={{ marginBottom: 16 }}>
+                        {articleLoading ? "Génération en cours..." : "Générer l'article"}
+                    </button>
+                    {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
+                    {article && (
+                        <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontFamily: "Georgia, serif" }}>
+                            {article}
+                        </div>
+                    )}
+                </div>
+            )}
 }
 
 ReactDOM
