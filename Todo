@@ -1,0 +1,30 @@
+------------------------
+Faire un article
+Il faut un paramètre date pour pouvoir régénérer article dans le passé 
+. N utilise que les infos dispo a cette date... 
+. Ou alors cacher les résultats par connus a date ? 
+Il faut un meilleur prompt.
+. Pas d info sur les copains.
+. Le point d entrée est la série (un parag par serie). 
+. Ajouter les infos sur les matchs. 
+. L article conclut sur la tendance. 
+. Quand on passe au tour 2, on regarde que les séries en cours
+. Et ainsi de suite
+
+------------------------
+Stocker articles
+. 1 par jour
+. sauf si pas de match pour la date
+. Affichage des anciens articles 
+
+------------------------
+Automatiser les taches 
+. A 8h tous les jours ? 
+. Tache 1 : recup les matchs 
+. Tache 2 : rédiger article avec les infos disponibles a date
+
+
+Faire un format mobile
+
+
+
