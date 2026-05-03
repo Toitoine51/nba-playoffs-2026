@@ -34,18 +34,30 @@ function App() {
     const [rawMatches, setRawMatches] = useState({});
     const [loading, setLoading] = useState(false);
     const [lastUpdate, setLastUpdate] = useState(null);
+    const [series, setSeries] = useState([]);
+    const [mapping, setMapping] = useState({});
 
-   useEffect(() => {
-       fetch("./pronos.json?v=1")
-           .then(r => r.json())
-           .then(data => setPronos(data))
-           .catch(err => {
-               console.error("PRONOS ERROR", err);
-               setPronos([]);
-           });
-   
-       fetchResults();
-   }, []);
+    useEffect(() => {
+        fetch("./pronos.json?v=1")
+            .then(r => r.json())
+            .then(data => setPronos(data))
+            .catch(err => {
+                console.error("PRONOS ERROR", err);
+                setPronos([]);
+            });
+
+        fetch("./series.json")
+            .then(r => r.json())
+            .then(data => setSeries(data))
+            .catch(err => console.error("SERIES ERROR", err));
+
+        fetch("./mapping.json")
+            .then(r => r.json())
+            .then(data => setMapping(data))
+            .catch(err => console.error("MAPPING ERROR", err));
+
+        fetchResults();
+    }, []);
 
     useEffect(() => {
         saveResults(results);
@@ -54,7 +66,6 @@ function App() {
     const fetchResults = async () => {
         setLoading(true);
         try {
-           
             // 1. Synchronise ESPN → KV
             await fetch("https://syncnba.toitoine51.workers.dev/");
 
@@ -90,6 +101,37 @@ function App() {
         return pts;
     };
 
+    const calcSerie = (serie) => {
+        const normalize = (abbr) => mapping[abbr] || abbr;
+
+        const matchs = Object.values(rawMatches).filter(m => {
+            const a = normalize(m.team_a);
+            const b = normalize(m.team_b);
+            return (
+                m.status === "Final" &&
+                ((a === serie.team_a && b === serie.team_b) ||
+                 (a === serie.team_b && b === serie.team_a))
+            );
+        });
+
+        let winsA = 0;
+        let winsB = 0;
+
+        matchs.forEach(m => {
+            const [scoreA, scoreB] = m.score.split("-").map(Number);
+            const a = normalize(m.team_a);
+            if (scoreA > scoreB) {
+                if (a === serie.team_a) winsA++;
+                else winsB++;
+            } else {
+                if (a === serie.team_a) winsB++;
+                else winsA++;
+            }
+        });
+
+        return { winsA, winsB };
+    };
+
     const matches = [
         "R1-O1", "R1-O2", "R1-O3", "R1-O4",
         "R1-E1", "R1-E2", "R1-E3", "R1-E4"
@@ -110,13 +152,14 @@ function App() {
     return (
         <div style={{ padding: 10, fontFamily: "Arial" }}>
 
-            <h1>NBA PLAYOFFS 2026 t1</h1>
+            <h1>NBA PLAYOFFS 2026</h1>
             {loading && <p style={{ textAlign: "center", color: "#fbbf24" }}>Chargement...</p>}
 
             <div style={{ margin: 10 }}>
                 <div style={{ display: "flex", gap: 10 }}>
                     <button onClick={() => setTab("pronos")}>Pronostics</button>
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
+                    <button onClick={() => setTab("scoreSeries")}>Score des séries</button>
                     <button onClick={() => setTab("series")}>Séries</button>
                 </div>
             </div>
@@ -181,19 +224,48 @@ function App() {
                             {Object.values(rawMatches)
                                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                                 .map((m, i) => (
-                                  <tr key={m.match_id} style={{ background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>
-                                      <td>{new Date(m.date).toLocaleDateString("fr-FR")}</td>
-                                      <td>{m.team_a} vs {m.team_b}</td>
-                                      <td>{m.score}</td>
-                                      <td>{m.status}</td>
-                                  </tr>
-                              ))
+                                    <tr key={m.match_id} style={{ background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>
+                                        <td>{new Date(m.date).toLocaleDateString("fr-FR")}</td>
+                                        <td>{m.team_a} vs {m.team_b}</td>
+                                        <td>{m.score}</td>
+                                        <td>{m.status}</td>
+                                    </tr>
+                                ))
                             }
                         </tbody>
                     </table>
                 </div>
             )}
 
+            {tab === "scoreSeries" && (
+                <div style={{ overflowX: "auto", maxHeight: "70vh", overflowY: "auto" }}>
+                    <table border="1" cellPadding="5">
+                        <thead>
+                            <tr style={{ position: "sticky", top: 0 }}>
+                                <th>Série</th>
+                                <th>Conf</th>
+                                <th>Équipe A</th>
+                                <th>Score</th>
+                                <th>Équipe B</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {series.map((s, i) => {
+                                const { winsA, winsB } = calcSerie(s);
+                                return (
+                                    <tr key={s.id} style={{ background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>
+                                        <td>{s.id}</td>
+                                        <td>{s.conf}</td>
+                                        <td>{s.team_a}</td>
+                                        <td>{winsA} - {winsB}</td>
+                                        <td>{s.team_b}</td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {tab === "series" && (
                 <div style={{ overflowX: "auto" }}>
