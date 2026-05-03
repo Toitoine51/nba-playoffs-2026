@@ -1,6 +1,7 @@
-const { useState, useEffect, useMemo } = React;
-const [lastUpdate, setLastUpdate] = useState(null);
+Le problème est ligne 2 — tu as mis `const [lastUpdate, setLastUpdate] = useState(null);` **en dehors** de la fonction `App()`. Il doit être à l'intérieur. Voici le fichier corrigé :
 
+```js
+const { useState, useEffect, useMemo } = React;
 
 /* ======================
    STORAGE (SAFE)
@@ -20,12 +21,7 @@ function loadMatches() {
 
 function saveMatches(data) {
     const existing = loadMatches();
-
-    const merged = {
-        ...existing,
-        ...data
-    };
-
+    const merged = { ...existing, ...data };
     localStorage.setItem("nba_matches", JSON.stringify(merged));
 }
 
@@ -36,19 +32,13 @@ function saveMatches(data) {
 function App() {
 
     const [tab, setTab] = useState("series");
-
     const [pronos, setPronos] = useState([]);
     const [results, setResults] = useState({});
-    const [rawMatches, setRawMatches] = useState({}); // 🔥 CLEAN START
-
+    const [rawMatches, setRawMatches] = useState({});
     const [loading, setLoading] = useState(false);
-
-    /* ======================
-       LOAD PRONOS
-    ====================== */
+    const [lastUpdate, setLastUpdate] = useState(null);
 
     useEffect(() => {
-
         fetch("./pronos.json?v=1")
             .then(r => r.json())
             .then(data => setPronos(data))
@@ -56,206 +46,143 @@ function App() {
                 console.error("PRONOS ERROR", err);
                 setPronos([]);
             });
-
     }, []);
-
-    /* ======================
-       SAVE RESULTS (OPTIONAL)
-    ====================== */
 
     useEffect(() => {
         saveResults(results);
     }, [results]);
 
-    /* ======================
-       FETCH MATCHES
-    ====================== */
-
     const fetchResults = async () => {
-    setLoading(true);
-    try {
-        const res = await fetch("https://syncnba.toitoine51.workers.dev/state");
-        const json = await res.json();
-
-        const newMatches = {};
-        (json.events || []).forEach(ev => {
-            newMatches[ev.match_id] = ev;
-        });
-
-        setRawMatches(newMatches);
-        setLastUpdate(new Date().toLocaleString("fr-FR"));
-        saveMatches(newMatches);
-
-       } catch (e) {
-           console.error("FETCH ERROR", e);
-       }
-       setLoading(false);
-   };
-
-    /* ======================
-       POINTS
-    ====================== */
+        setLoading(true);
+        try {
+            const res = await fetch("https://syncnba.toitoine51.workers.dev/state");
+            const json = await res.json();
+            const newMatches = {};
+            (json.events || []).forEach(ev => {
+                newMatches[ev.match_id] = ev;
+            });
+            setRawMatches(newMatches);
+            setLastUpdate(new Date().toLocaleString("fr-FR"));
+            saveMatches(newMatches);
+        } catch (e) {
+            console.error("FETCH ERROR", e);
+        }
+        setLoading(false);
+    };
 
     const calculatePoints = (prono, real) => {
-
         if (!real) return 0;
-
         const isFinal =
             real.status === "Final" ||
             real.status?.type?.description === "Final";
-
         if (!isFinal) return 0;
-
         let pts = 0;
-
         if (prono.gagnant === real.winner) {
-
             pts += 10;
-
             if (prono.score === real.score) {
                 pts += 10;
             }
-
         }
-
         return pts;
     };
 
-    /* ======================
-       MATCHES FIXES
-    ====================== */
-
     const matches = [
-        "R1-O1",
-        "R1-O2",
-        "R1-O3",
-        "R1-O4",
-        "R1-E1",
-        "R1-E2",
-        "R1-E3",
-        "R1-E4"
+        "R1-O1", "R1-O2", "R1-O3", "R1-O4",
+        "R1-E1", "R1-E2", "R1-E3", "R1-E4"
     ];
 
-    const joueurs = [
-        "Guilhem",
-        "Ousset",
-        "Jeff",
-        "Daude",
-        "Antoine"
-    ];
-
-    /* ======================
-       TOTALS
-    ====================== */
+    const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
 
     const totals = useMemo(() => {
-
         const t = {};
-
         joueurs.forEach(j => {
-
             t[j] = pronos
                 .filter(p => p.joueur === j)
-                .reduce((sum, p) => {
-
-                    return sum + calculatePoints(
-                        p,
-                        rawMatches[p.match_id]
-                    );
-
-                }, 0);
-
+                .reduce((sum, p) => sum + calculatePoints(p, rawMatches[p.match_id]), 0);
         });
-
         return t;
-
     }, [pronos, rawMatches]);
 
-    /* ======================
-       UI
-    ====================== */
-
     return (
-    <div style={{ padding: 10, fontFamily: "Arial" }}>
+        <div style={{ padding: 10, fontFamily: "Arial" }}>
 
-        <h1>NBA PLAYOFFS 2026 test</h1>
-      
-      <div style={{ margin: 10 }}>
-          <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setTab("pronos")}>Pronostics</button>
-              <button onClick={() => setTab("raw")}>Score des matchs</button>
-              <button onClick={() => setTab("series")}>Séries</button>
-          </div>
-         <div>
-          <button onClick={fetchResults}>
-              {loading ? "Loading..." : "Mettre à jour"}
-          </button>
-          {lastUpdate && <span style={{ marginLeft: 10, color: "#fbbf24" }}>Mis à jour le {lastUpdate}</span>}
-          </div>
-      </div>
+            <h1>NBA PLAYOFFS 2026</h1>
 
-        {tab === "pronos" && (
-            <pre>{JSON.stringify(pronos, null, 2)}</pre>
-        )}
-
-        {tab === "raw" && (
-            <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
-        )}
-
-        {tab === "series" && (
-            <div style={{ overflowX: "auto" }}>
-                <table border="1" cellPadding="5">
-                    <thead>
-                        <tr>
-                            <th>Match</th>
-                            <th>Score</th>
-                            {joueurs.map(j => (
-                                <th key={j}>{j}<br />{totals[j]}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {matches.map(id => {
-                            const real = rawMatches[id] || {};
-                            return (
-                                <tr key={id}>
-                                    <td>
-                                        {id}<br />
-                                        {real.teamA || "TBD"} vs {real.teamB || "TBD"}<br />
-                                        {real.status || "-"}
-                                    </td>
-                                    <td>{real.score || "-"}</td>
-                                    {joueurs.map(j => {
-                                        const prono = pronos.find(
-                                            p => p.joueur === j && p.match_id === id
-                                        );
-                                        const pts = prono ? calculatePoints(prono, real) : 0;
-                                        return (
-                                            <td key={j}>
-                                                {prono ? (
-                                                    <>
-                                                        {prono.gagnant} {prono.score}
-                                                        <br />
-                                                        +{pts}
-                                                    </>
-                                                ) : "-"}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+            <div style={{ margin: 10 }}>
+                <div style={{ display: "flex", gap: 10 }}>
+                    <button onClick={() => setTab("pronos")}>Pronostics</button>
+                    <button onClick={() => setTab("raw")}>Score des matchs</button>
+                    <button onClick={() => setTab("series")}>Séries</button>
+                </div>
+                <div>
+                    <button onClick={fetchResults}>
+                        {loading ? "Loading..." : "Mettre à jour"}
+                    </button>
+                    {lastUpdate && <span style={{ marginLeft: 10, color: "#fbbf24" }}>Mis à jour le {lastUpdate}</span>}
+                </div>
             </div>
-        )}
 
-    </div>
-);
-   
-    
+            {tab === "pronos" && (
+                <pre>{JSON.stringify(pronos, null, 2)}</pre>
+            )}
+
+            {tab === "raw" && (
+                <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
+            )}
+
+            {tab === "series" && (
+                <div style={{ overflowX: "auto" }}>
+                    <table border="1" cellPadding="5">
+                        <thead>
+                            <tr>
+                                <th>Match</th>
+                                <th>Score</th>
+                                {joueurs.map(j => (
+                                    <th key={j}>{j}<br />{totals[j]}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {matches.map(id => {
+                                const real = rawMatches[id] || {};
+                                return (
+                                    <tr key={id}>
+                                        <td>
+                                            {id}<br />
+                                            {real.teamA || "TBD"} vs {real.teamB || "TBD"}<br />
+                                            {real.status || "-"}
+                                        </td>
+                                        <td>{real.score || "-"}</td>
+                                        {joueurs.map(j => {
+                                            const prono = pronos.find(
+                                                p => p.joueur === j && p.match_id === id
+                                            );
+                                            const pts = prono ? calculatePoints(prono, real) : 0;
+                                            return (
+                                                <td key={j}>
+                                                    {prono ? (
+                                                        <>
+                                                            {prono.gagnant} {prono.score}
+                                                            <br />
+                                                            +{pts}
+                                                        </>
+                                                    ) : "-"}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+        </div>
+    );
 }
 
 ReactDOM
     .createRoot(document.getElementById("root"))
     .render(<App />);
+```
