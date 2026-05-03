@@ -152,7 +152,7 @@ function App() {
     return (
         <div style={{ padding: 10, fontFamily: "Arial" }}>
 
-            <h1>NBA PLAYOFFS 2026</h1>
+            <h1>NBA PLAYOFFS 2026 tmp1</h1>
             {loading && <p style={{ textAlign: "center", color: "#fbbf24" }}>Chargement...</p>}
 
             <div style={{ margin: 10 }}>
