@@ -296,7 +296,7 @@ function App() {
                                                 <td key={j}>
                                                     {prono ? (
                                                         <>
-                                                            {prono.gagnant} {prono.score}
+                                                            {prono.gagnant} {prono.score} {prono.perdant}
                                                             <br />
                                                             +{pts}
                                                         </>
