@@ -17,3 +17,9 @@ Ton amusant
 Conclusion tendances
 4. Mobile (plus tard)
 Optimiser tableaux et mise en page
+Reformatage mobile
+Barre de boutons : flexWrap: "wrap" + sticky en haut
+Tableau classement : colonnes "Série" et "Score" sticky à gauche
+Ligne de titre : sticky en haut du tableau
+~30 min, tout dans app.js et style.css.
+
