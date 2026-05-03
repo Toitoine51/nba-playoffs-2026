@@ -128,8 +128,35 @@ function App() {
                 <pre>{JSON.stringify(pronos, null, 2)}</pre>
             )}
 
-            {tab === "raw" && (
+            /*{tab === "raw" && (
                 <pre>{JSON.stringify(rawMatches, null, 2)}</pre>
+            )}*/
+            {tab === "raw" && (
+                <div style={{ overflowX: "auto", maxHeight: "70vh", overflowY: "auto" }}>
+                    <table border="1" cellPadding="5">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Match</th>
+                                <th>Score</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.values(rawMatches)
+                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                .map(m => (
+                                    <tr key={m.match_id}>
+                                        <td>{new Date(m.date).toLocaleDateString("fr-FR")}</td>
+                                        <td>{m.team_a} vs {m.team_b}</td>
+                                        <td>{m.score}</td>
+                                        <td>{m.status}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
             )}
 
             {tab === "series" && (
