@@ -1,4 +1,6 @@
 const { useState, useEffect, useMemo } = React;
+const [lastUpdate, setLastUpdate] = useState(null);
+
 
 /* ======================
    STORAGE (SAFE)
@@ -81,6 +83,7 @@ function App() {
         });
 
         setRawMatches(newMatches);
+        setLastUpdate(new Date().toLocaleString("fr-FR"));
         saveMatches(newMatches);
 
        } catch (e) {
@@ -88,64 +91,6 @@ function App() {
        }
        setLoading(false);
    };
-    /*
-    const fetchResults = async () => {
-
-        setLoading(true);
-
-        try {
-
-            const res = await fetch(
-                "https://scrap.toitoine51.workers.dev/?start=20260414&days=3"
-            );
-
-            const json = await res.json();
-
-            const newResults = {};
-
-            (json.events || []).forEach(m => {
-
-                const key =
-                    m.match_id ||
-                    m.id ||
-                    m.game_id ||
-                    m.event_id;
-
-                if (!key) return;
-
-                const statusText =
-                    m.status?.type?.description ||
-                    m.status ||
-                    "Scheduled";
-
-                newResults[key] = {
-
-                    score: m.series_score || m.score || "-",
-                    winner: m.winner || "",
-                    loser: m.loser || "",
-                    status: statusText,
-                    teamA: m.team_a || "",
-                    teamB: m.team_b || ""
-
-                };
-
-            });
-
-            // update state
-            setRawMatches(prev => ({
-                ...prev,
-                ...newResults
-            }));
-
-            // persist
-            saveMatches(newResults);
-
-        } catch (e) {
-            console.error("FETCH ERROR", e);
-        }
-
-        setLoading(false);
-    };*/
 
     /* ======================
        POINTS
@@ -241,10 +186,11 @@ function App() {
               <button onClick={() => setTab("raw")}>Score des matchs</button>
               <button onClick={() => setTab("series")}>Séries</button>
           </div>
-          <div>
-              <button onClick={fetchResults}>
-                  {loading ? "Loading..." : "Mettre à jour"}
-              </button>
+         <div>
+          <button onClick={fetchResults}>
+              {loading ? "Loading..." : "Mettre à jour"}
+          </button>
+          {lastUpdate && <span style={{ marginLeft: 10, color: "#fbbf24" }}>Mis à jour le {lastUpdate}</span>}
           </div>
       </div>
 
