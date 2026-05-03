@@ -167,19 +167,10 @@ function App() {
             )}
 
             {tab === "raw" && (
-
-               <thead>
-                   <tr style={{ position: "sticky", top: 0 }}>
-                       <th>Date</th>
-                       <th>Match</th>
-                       <th>Score</th>
-                       <th>Statut</th>
-                   </tr>
-               </thead>
                 <div style={{ overflowX: "auto", maxHeight: "70vh", overflowY: "auto" }}>
                     <table border="1" cellPadding="5">
                         <thead>
-                            <tr>
+                            <tr style={{ position: "sticky", top: 0 }}>
                                 <th>Date</th>
                                 <th>Match</th>
                                 <th>Score</th>
@@ -202,7 +193,6 @@ function App() {
                     </table>
                 </div>
             )}
-
             {tab === "series" && (
                 <div style={{ overflowX: "auto" }}>
                     <table border="1" cellPadding="5">
