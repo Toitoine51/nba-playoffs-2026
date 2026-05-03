@@ -66,10 +66,7 @@ function App() {
     const fetchResults = async () => {
         setLoading(true);
         try {
-            // 1. Synchronise ESPN → KV
             await fetch("https://syncnba.toitoine51.workers.dev/");
-
-            // 2. Lit le KV et affiche
             const res = await fetch("https://syncnba.toitoine51.workers.dev/state");
             const json = await res.json();
             const newMatches = {};
@@ -85,16 +82,13 @@ function App() {
         setLoading(false);
     };
 
-    const calculatePoints = (prono, real) => {
-        if (!real) return 0;
-        const isFinal =
-            real.status === "Final" ||
-            real.status?.type?.description === "Final";
-        if (!isFinal) return 0;
+    const calculatePoints = (prono, serieScore) => {
+        if (!serieScore) return 0;
+        if (!serieScore.termine) return 0;
         let pts = 0;
-        if (prono.gagnant === real.winner) {
+        if (prono.gagnant === serieScore.gagnant) {
             pts += 10;
-            if (prono.score === real.score) {
+            if (prono.score === serieScore.score) {
                 pts += 10;
             }
         }
@@ -129,30 +123,36 @@ function App() {
             }
         });
 
-        return { winsA, winsB };
-    };
+        const termine = winsA === 4 || winsB === 4;
+        const gagnant = winsA === 4 ? serie.team_a : winsB === 4 ? serie.team_b : null;
+        const score = termine ? `${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}` : null;
 
-    const matches = [
-        "R1-O1", "R1-O2", "R1-O3", "R1-O4",
-        "R1-E1", "R1-E2", "R1-E3", "R1-E4"
-    ];
+        return { winsA, winsB, termine, gagnant, score };
+    };
 
     const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
 
     const totals = useMemo(() => {
         const t = {};
         joueurs.forEach(j => {
-            t[j] = pronos
-                .filter(p => p.joueur === j)
-                .reduce((sum, p) => sum + calculatePoints(p, rawMatches[p.match_id]), 0);
+            t[j] = series.reduce((sum, s) => {
+                const serieScore = calcSerie(s);
+                const prono = pronos.find(p => p.joueur === j && p.match_id === s.id);
+                if (!prono) return sum;
+                return sum + calculatePoints(prono, serieScore);
+            }, 0);
         });
         return t;
-    }, [pronos, rawMatches]);
+    }, [pronos, rawMatches, series, mapping]);
+
+    const joueursTries = useMemo(() => {
+        return [...joueurs].sort((a, b) => (totals[b] || 0) - (totals[a] || 0));
+    }, [totals]);
 
     return (
         <div style={{ padding: 10, fontFamily: "Arial" }}>
 
-            <h1>NBA PLAYOFFS 2026 tmp1</h1>
+            <h1>NBA PLAYOFFS 2026</h1>
             {loading && <p style={{ textAlign: "center", color: "#fbbf24" }}>Chargement...</p>}
 
             <div style={{ margin: 10 }}>
@@ -271,30 +271,27 @@ function App() {
                 <div style={{ overflowX: "auto" }}>
                     <table border="1" cellPadding="5">
                         <thead>
-                            <tr>
-                                <th>Match</th>
+                            <tr style={{ position: "sticky", top: 0 }}>
+                                <th>Série</th>
                                 <th>Score</th>
-                                {joueurs.map(j => (
+                                {joueursTries.map(j => (
                                     <th key={j}>{j}<br />{totals[j]}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
-                            {matches.map(id => {
-                                const real = rawMatches[id] || {};
+                            {series.map((s, i) => {
+                                const serieScore = calcSerie(s);
+                                const scoreAffiche = `${s.team_a} ${serieScore.winsA}-${serieScore.winsB} ${s.team_b}`;
                                 return (
-                                    <tr key={id}>
-                                        <td>
-                                            {id}<br />
-                                            {real.teamA || "TBD"} vs {real.teamB || "TBD"}<br />
-                                            {real.status || "-"}
-                                        </td>
-                                        <td>{real.score || "-"}</td>
-                                        {joueurs.map(j => {
+                                    <tr key={s.id} style={{ background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>
+                                        <td>{s.id}</td>
+                                        <td>{scoreAffiche}</td>
+                                        {joueursTries.map(j => {
                                             const prono = pronos.find(
-                                                p => p.joueur === j && p.match_id === id
+                                                p => p.joueur === j && p.match_id === s.id
                                             );
-                                            const pts = prono ? calculatePoints(prono, real) : 0;
+                                            const pts = prono ? calculatePoints(prono, serieScore) : 0;
                                             return (
                                                 <td key={j}>
                                                     {prono ? (
