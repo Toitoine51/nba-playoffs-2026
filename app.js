@@ -119,12 +119,14 @@ function App() {
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
                     <button onClick={() => setTab("series")}>Séries</button>
                 </div>
+               /*
                 <div>
                     <button onClick={fetchResults}>
                         {loading ? "Loading..." : "Mettre à jour"}
                     </button>
                     {lastUpdate && <span style={{ marginLeft: 10, color: "#fbbf24" }}>Mis à jour le {lastUpdate}</span>}
                 </div>
+                       */
             </div>
 
             {tab === "pronos" && (
