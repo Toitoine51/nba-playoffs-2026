@@ -232,31 +232,14 @@ function App() {
 
     return (
 
-        <div style={{ padding: 10, fontFamily: "Arial" }}>
-
-            <h1>NBA PLAYOFFS 2026</h1>
-
-            <button onClick={fetchResults}>
-                {loading ? "Loading..." : "charger les derniers résultats"}
-            </button>
-
-            {/* TABS */}
-
-            <div style={{ display: "flex", gap: 10, margin: 10 }}>
-
-                <button onClick={() => setTab("pronos")}>
-                    Pronostics
-                </button>
-
-                <button onClick={() => setTab("raw")}>
-                    Score des matchs
-                </button>
-
-                <button onClick={() => setTab("series")}>
-                    Séries
-                </button>
-
-            </div>
+        <div style={{ display: "flex", gap: 10, margin: 10 }}>
+             <button onClick={() => setTab("pronos")}>Pronostics</button>
+             <button onClick={() => setTab("raw")}>Score des matchs</button>
+             <button onClick={fetchResults}>
+                 {loading ? "Loading..." : "Mettre à jour"}
+             </button>
+             <button onClick={() => setTab("series")}>Séries</button>
+         </div>
 
             {/* PRONOS */}
 
