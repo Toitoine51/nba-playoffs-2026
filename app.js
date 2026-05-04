@@ -39,6 +39,7 @@ function App() {
     const [article, setArticle] = useState("");
     const [articleLoading, setArticleLoading] = useState(false);
     const [articleError, setArticleError] = useState("");
+    const [articlesList, setArticlesList] = useState([]); 
 
     useEffect(() => {
         fetch("./pronos.json?v=1")
@@ -70,6 +71,8 @@ function App() {
       useEffect(() => {
        if (pronos.length > 0 && series.length > 0 && Object.keys(mapping).length > 0 && Object.keys(rawMatches).length > 0 && Object.keys(totals).length > 0) {
            fetchArticle();
+           fetchArticlesList();   
+          
        }
    }, [pronos, series, mapping, rawMatches, totals]);
 
@@ -297,6 +300,18 @@ ${classement}`;
            setArticleError("Erreur réseau : " + e.message);
        }
        setArticleLoading(false);
+   };
+
+   const fetchArticlesList = async () => {
+       try {
+           const res = await fetch("https://syncnba.toitoine51.workers.dev/articles");
+           const json = await res.json();
+           if (json.ok) {
+               setArticlesList(json.articles.sort((a, b) => b.date.localeCompare(a.date)));
+           }
+       } catch (e) {
+           console.error("fetchArticlesList error", e);
+       }
    };
 
     const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
@@ -547,6 +562,16 @@ ${classement}`;
     {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
                     {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
+                     {articlesList.length > 1 && (
+                         <div style={{ marginBottom: 16 }}>
+                             <span style={{ color: "#fbbf24", fontSize: 13 }}>Anciens articles : </span>
+                             {articlesList.map(a => (
+                                 <button key={a.date} onClick={() => setArticle(a.text)} style={{ marginRight: 6, fontSize: 12 }}>
+                                     {new Date(a.date).toLocaleDateString("fr-FR")}
+                                 </button>
+                             ))}
+                         </div>
+                     )}
                     {article && (
                    <div>
                        <p style={{ color: "#fbbf24", fontSize: 13 }}>Article du {new Date().toLocaleDateString("fr-FR")}</p>
