@@ -343,7 +343,7 @@ ${classement}
             )}
 
             {tab === "series" && (
-                <div style={{ overflowX: "auto" }}>
+                <div style={{ overflowX: "auto", position: "relative"  }}>
                     <table border="1" cellPadding="5">
                         <thead>
                             <tr style={{ position: "sticky", top: 0 }}>
