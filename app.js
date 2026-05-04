@@ -192,6 +192,7 @@ ${classement}
        setArticleLoading(true);
        setArticleError("");
        setArticle("");
+       console.log("fetchArticle called, hour:", new Date().getHours());
        try {
            // 1. Vérifier si article du jour existe dans KV
            const res = await fetch("https://syncnba.toitoine51.workers.dev/article");
