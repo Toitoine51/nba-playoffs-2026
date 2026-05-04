@@ -60,12 +60,17 @@ function App() {
             .catch(err => console.error("MAPPING ERROR", err));
 
         fetchResults();
-        fetchArticle();
     }, []);
 
     useEffect(() => {
         saveResults(results);
     }, [results]);
+
+    useEffect(() => {
+       if (pronos.length > 0 && series.length > 0 && Object.keys(mapping).length > 0 && Object.keys(rawMatches).length > 0) {
+           fetchArticle();
+       }
+   }, [pronos, series, mapping, rawMatches]);
 
     const fetchResults = async () => {
         setLoading(true);
