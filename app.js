@@ -214,7 +214,7 @@ const buildPrompt = (dateMax = null) => {
 
         const matchsDetails = series.map(s => {
           const normalize = (abbr) => mapping[abbr] || abbr;
-          const matchs = Object.values(rawMatches).filter(m => {
+          const matchs = Object.values(filteredMatches).filter(m => {
               const a = normalize(m.team_a);
               const b = normalize(m.team_b);
               return (
