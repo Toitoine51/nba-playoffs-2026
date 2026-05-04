@@ -60,6 +60,7 @@ function App() {
             .catch(err => console.error("MAPPING ERROR", err));
 
         fetchResults();
+        fetchArticle();
     }, []);
 
     useEffect(() => {
@@ -182,26 +183,50 @@ ${classement}
    };
 
    const fetchArticle = async () => {
-        setArticleLoading(true);
-        setArticleError("");
-        setArticle("");
-        try {
-            const res = await fetch("https://gemini.toitoine51.workers.dev/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt: buildPrompt() })
-            });
-            const json = await res.json();
-            if (json.ok) {
-                setArticle(json.text);
-            } else {
-                setArticleError("Erreur Gemini : " + json.error);
-            }
-        } catch (e) {
-            setArticleError("Erreur réseau : " + e.message);
-        }
-        setArticleLoading(false);
-    };
+       setArticleLoading(true);
+       setArticleError("");
+       setArticle("");
+       try {
+           // 1. Vérifier si article du jour existe dans KV
+           const res = await fetch("https://syncnba.toitoine51.workers.dev/article");
+           const json = await res.json();
+   
+           const hour = new Date().getHours();
+           const today = new Date().toISOString().slice(0, 10);
+   
+           if (json.text && json.date === today) {
+               // Article du jour existe
+               setArticle(json.text);
+           } else if (json.text && json.date !== today && hour < 9) {
+               // Avant 9h → afficher article de la veille
+               setArticle(json.text);
+           } else if (hour >= 9) {
+               // Après 9h → générer
+               const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
+                   method: "POST",
+                   headers: { "Content-Type": "application/json" },
+                   body: JSON.stringify({ prompt: buildPrompt() })
+               });
+               const mistralJson = await mistralRes.json();
+               if (mistralJson.ok) {
+                   // Stocker dans KV
+                   await fetch("https://syncnba.toitoine51.workers.dev/article", {
+                       method: "POST",
+                       headers: { "Content-Type": "application/json" },
+                       body: JSON.stringify({ text: mistralJson.text })
+                   });
+                   setArticle(mistralJson.text);
+               } else {
+                   setArticleError("Erreur Mistral : " + mistralJson.error);
+               }
+           } else {
+               setArticleError("Pas d'article disponible avant 9h.");
+           }
+       } catch (e) {
+           setArticleError("Erreur réseau : " + e.message);
+       }
+       setArticleLoading(false);
+   };
 
     const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
 
@@ -450,9 +475,6 @@ ${classement}
 
     {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
-                    <button onClick={fetchArticle} disabled={articleLoading} style={{ marginBottom: 16 }}>
-                        {articleLoading ? "Génération en cours..." : "Générer l'article"}
-                    </button>
                     {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
                     {article && (
                         <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontFamily: "Georgia, serif" }}>
