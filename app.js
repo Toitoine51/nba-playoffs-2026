@@ -234,7 +234,7 @@ ${classement}
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
                     <button onClick={() => setTab("scoreSeries")}>Score des séries</button>
                     <button onClick={() => setTab("series")}>Classement pronos</button>
-                    <button onClick={() => setTab("article")}>Analyse des résultats </button>
+                    <button onClick={() => setTab("article") disabled}>Analyse des résultats </button>
                     <button onClick={() => setTab("regles")}>Calcul des points</button>
                 </div>
             </div>
