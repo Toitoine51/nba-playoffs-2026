@@ -153,9 +153,38 @@ function App() {
         return { winsA, winsB, termine, gagnant, perdant, score };
     };
 
-   const buildPrompt = () => {
-        const lignes = series.map(s => {
-            const sc = calcSerie(s);
+const buildPrompt = (dateMax = null) => {
+    const filteredMatches = dateMax
+        ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
+        : rawMatches;
+
+    const calcSerieFiltered = (serie) => {
+        const normalize = (abbr) => mapping[abbr] || abbr;
+        const matchs = Object.values(filteredMatches).filter(m => {
+            const a = normalize(m.team_a);
+            const b = normalize(m.team_b);
+            return (
+                m.status === "Final" &&
+                ((a === serie.team_a && b === serie.team_b) ||
+                 (a === serie.team_b && b === serie.team_a))
+            );
+        });
+        let winsA = 0, winsB = 0;
+        matchs.forEach(m => {
+            const [scoreA, scoreB] = m.score.split("-").map(Number);
+            const a = normalize(m.team_a);
+            if (scoreA > scoreB) { if (a === serie.team_a) winsA++; else winsB++; }
+            else { if (a === serie.team_a) winsB++; else winsA++; }
+        });
+        const termine = winsA === 4 || winsB === 4;
+        const gagnant = winsA === 4 ? serie.team_a : winsB === 4 ? serie.team_b : null;
+        const perdant = winsA === 4 ? serie.team_b : winsB === 4 ? serie.team_a : null;
+        const score = termine ? `${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}` : null;
+        return { winsA, winsB, termine, gagnant, perdant, score };
+    };
+
+    const lignes = series.map(s => {
+        const sc = calcSerieFiltered(s);
             const statut = sc.termine
                 ? `TERMINÉE : ${sc.gagnant} bat ${sc.perdant} ${sc.score}`
                 : `En cours : ${s.team_a} ${sc.winsA}-${sc.winsB} ${s.team_b}`;
@@ -163,7 +192,7 @@ function App() {
         }).join("\n");
 
         const pronosDetails = series.map(s => {
-          const sc = calcSerie(s);
+          const sc = calcSerieFiltered(s);
           const ligneJoueurs = joueurs.map(j => {
               const prono = pronos.find(p => p.joueur === j && p.match_id === s.id);
               if (!prono) return `  ${j}: pas de prono`;
@@ -224,10 +253,9 @@ CLASSEMENT :
 ${classement}`;   
    };
 
-   const fetchArticle = async () => {
-       setArticleLoading(true);
-       setArticleError("");
-       setArticle("");
+   const fetchArticle = async (dateParam = null) => {
+       const today = new Date().toISOString().slice(0, 10);
+       const targetDate = dateParam || today;
        console.log("fetchArticle called, hour:", new Date().getHours());
        try {
            // 1. Vérifier si article du jour existe dans KV
@@ -235,12 +263,12 @@ ${classement}`;
            const json = await res.json();
    
            const hour = new Date().getHours();
-           const today = new Date().toISOString().slice(0, 10);
+           
    
-           if (json.text && json.date === today) {
+           if (json.text && json.date === targetDate) {
                // Article du jour existe
                setArticle(json.text);
-           } else if (json.text && json.date !== today && hour < 9) {
+           } else if (json.text && json.date !== targetDate && hour < 9) {
                // Avant 9h → afficher article de la veille
                setArticle(json.text);
            } else if (hour >= 9) {
@@ -248,7 +276,7 @@ ${classement}`;
                const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
                    method: "POST",
                    headers: { "Content-Type": "application/json" },
-                   body: JSON.stringify({ prompt: buildPrompt() })
+                   body: JSON.stringify({ prompt: buildPrompt(targetDate) }) 
                });
                const mistralJson = await mistralRes.json();
                if (mistralJson.ok) {
@@ -256,7 +284,7 @@ ${classement}`;
                    await fetch("https://syncnba.toitoine51.workers.dev/article", {
                        method: "POST",
                        headers: { "Content-Type": "application/json" },
-                       body: JSON.stringify({ text: mistralJson.text })
+                       body: JSON.stringify({ text: mistralJson.text, date: targetDate })
                    });
                    setArticle(mistralJson.text);
                } else {
@@ -277,7 +305,7 @@ ${classement}`;
         const t = {};
         joueurs.forEach(j => {
             t[j] = series.reduce((sum, s) => {
-                const serieScore = calcSerie(s);
+                const serieScore = calcSerieFiltered(s);
                 const prono = pronos.find(p => p.joueur === j && p.match_id === s.id);
                 if (!prono) return sum;
                 return sum + calculatePoints(prono, serieScore);
