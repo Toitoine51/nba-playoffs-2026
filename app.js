@@ -565,6 +565,8 @@ ${classement}`;
 
     {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
+
+       {false && (
                <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
                    <input
                        type="date"
@@ -579,6 +581,7 @@ ${classement}`;
                        Générer pour cette date
                    </button>
                </div>
+)}
                     {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
                      {articlesList.length > 1 && (
                       <div style={{ marginBottom: 16 }}>
