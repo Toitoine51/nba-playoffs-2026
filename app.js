@@ -548,10 +548,13 @@ ${classement}`;
                 <div style={{ padding: 10, maxWidth: 700 }}>
                     {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
                     {article && (
-                        <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontFamily: "Georgia, serif" }}>
-                            {article}
-                        </div>
-                    )}
+                   <div>
+                       <p style={{ color: "#fbbf24", fontSize: 13 }}>Article du {new Date().toLocaleDateString("fr-FR")}</p>
+                       <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontFamily: "Georgia, serif" }}>
+                           {article}
+                       </div>
+                   </div>
+               )}
                 </div>
             )}
 
