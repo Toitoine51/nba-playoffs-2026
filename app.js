@@ -561,6 +561,20 @@ ${classement}`;
 
     {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
+               <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+                   <input
+                       type="date"
+                       id="articleDate"
+                       defaultValue={new Date().toISOString().slice(0, 10)}
+                       style={{ padding: 6, borderRadius: 6, border: "1px solid #444", background: "#1a2740", color: "white" }}
+                   />
+                   <button onClick={() => {
+                       const date = document.getElementById("articleDate").value;
+                       fetchArticle(date);
+                   }}>
+                       Générer pour cette date
+                   </button>
+               </div>
                     {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
                      {articlesList.length > 1 && (
                          <div style={{ marginBottom: 16 }}>
