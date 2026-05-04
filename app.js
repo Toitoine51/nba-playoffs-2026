@@ -229,7 +229,7 @@ ${classement}
             {loading && <p style={{ textAlign: "center", color: "#fbbf24" }}>Chargement...</p>}
 
             <div style={{ margin: 10 }}>
-                <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", position: "sticky", top: 0, background: "#0b0f1a", zIndex: 10, paddingBottom: 6 }}>
                     <button onClick={() => setTab("pronos")}>Pronostics</button>
                     <button onClick={() => setTab("raw")}>Score des matchs</button>
                     <button onClick={() => setTab("scoreSeries")}>Score des séries</button>
@@ -347,8 +347,8 @@ ${classement}
                     <table border="1" cellPadding="5">
                         <thead>
                             <tr style={{ position: "sticky", top: 0 }}>
-                                <th>Série</th>
-                                <th>Score</th>
+                                <th style={{ position: "sticky", left: 0, zIndex: 2, background: "#1d428a" }}>Série</th>
+                                <th style={{ position: "sticky", left: 50, zIndex: 2, background: "#1d428a" }}>Score</th>
                                 {joueursTries.map(j => (
                                     <th key={j}>{j}<br /><span style={{ color: "#c8102e", fontWeight: "bold" }}>{totals[j]}</span></th>
                                 ))}
@@ -369,8 +369,8 @@ ${classement}
                                 const scoreAffiche = `${s.team_a} ${serieScore.winsA}-${serieScore.winsB} ${s.team_b}`;
                                 return (
                                     <tr key={s.id} style={{ background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>
-                                        <td>{s.id}</td>
-                                        <td>{scoreAffiche}</td>
+                                       <td style={{ position: "sticky", left: 0, zIndex: 1, background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>{s.id}</td>
+                                       <td style={{ position: "sticky", left: 50, zIndex: 1, background: i % 2 === 0 ? "#1a2740" : "#0f172a" }}>{scoreAffiche}</td>
                                         {joueursTries.map(j => {
                                             const prono = pronos.find(
                                                 p => p.joueur === j && p.match_id === s.id
