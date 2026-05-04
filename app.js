@@ -305,7 +305,7 @@ ${classement}`;
         const t = {};
         joueurs.forEach(j => {
             t[j] = series.reduce((sum, s) => {
-                const serieScore = calcSerieFiltered(s);
+                const serieScore = calcSerie(s);
                 const prono = pronos.find(p => p.joueur === j && p.match_id === s.id);
                 if (!prono) return sum;
                 return sum + calculatePoints(prono, serieScore);
