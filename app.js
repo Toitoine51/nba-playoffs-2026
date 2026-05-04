@@ -162,30 +162,66 @@ function App() {
             return `- ${s.id} (${s.conf}) : ${statut}`;
         }).join("\n");
 
+        const pronosDetails = series.map(s => {
+          const sc = calcSerie(s);
+          const ligneJoueurs = joueurs.map(j => {
+              const prono = pronos.find(p => p.joueur === j && p.match_id === s.id);
+              if (!prono) return `  ${j}: pas de prono`;
+              let resultat = "";
+              if (sc.termine) {
+                  const bonGagnant = prono.gagnant === sc.gagnant;
+                  const bonPerdant = bonGagnant && prono.perdant === sc.perdant;
+                  const bonScore = bonGagnant && prono.score === sc.score;
+                  resultat = ` → ${bonGagnant ? "✓ gagnant" : "✗ gagnant"} ${bonPerdant ? "✓ perdant" : "✗ perdant"} ${bonScore ? "✓ score" : "✗ score"}`;
+              }
+              return `  ${j}: ${prono.gagnant} bat ${prono.perdant} ${prono.score}${resultat}`;
+          }).join("\n");
+          return `${s.id} (${s.conf}) :\n${ligneJoueurs}`;
+      }).join("\n\n");
+
+        const matchsDetails = series.map(s => {
+          const normalize = (abbr) => mapping[abbr] || abbr;
+          const matchs = Object.values(rawMatches).filter(m => {
+              const a = normalize(m.team_a);
+              const b = normalize(m.team_b);
+              return (
+                  m.status === "Final" &&
+                  ((a === s.team_a && b === s.team_b) ||
+                   (a === s.team_b && b === s.team_a))
+              );
+          }).sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+          if (matchs.length === 0) return `${s.id} : pas de match joué`;
+          const lignes = matchs.map((m, i) => `  Match ${i+1} : ${m.team_a} ${m.score} ${m.team_b}`).join("\n");
+          return `${s.id} :\n${lignes}`;
+      }).join("\n\n");
+
         const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
 
-   return `Nous sommes le ${new Date().toLocaleDateString("fr-FR")}.
+return `Nous sommes le ${new Date().toLocaleDateString("fr-FR")}.
 
-Tu es un analyste sportif passionné. Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 5 amis.
+Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 5 amis.
 
-Il y a 5 participants, voici quelques infos sur eux (à utiliser avec subtilité, pas besoin d'en parler pour chaque série) :
-- Guilhem suit la NBA depuis 5 ans, très assidu, utilise l'app NBA au quotidien
-- Daude est le plus expérimenté historiquement
-- Ousset et Jeff sont plutôt des footeux
-- Antoine est le néophyte du groupe
+Structure de l'analyse :
+- Un paragraphe par série, en commençant par le tour 1
+- Pour chaque série : parle des matchs joués, de l'état de la série, et des pronos des participants (bons coups, erreurs, surprises)
+- N'oublie pas que si un participant n'a pas le bon vainqueur, il va perdre des points sur le reste de la série
+- Quand le tour 1 est terminé, passe au tour 2 avec juste un bref récap du tour 1
+- Conclus sur les tendances du classement : qui est bien parti, qui se rate
 
-L'analyse doit être centrée sur le concours de pronos : les bons coups, les erreurs, les surprises, qui est en forme, qui se plante. Les résultats des matchs sont là pour donner du contexte, pas pour être le sujet principal.
+Ton : amusant, décalé, comme entre amis. Pas de titre, pas de sous-titres. Texte continu.
 
 RÉSULTATS DES SÉRIES :
 ${lignes}
 
-CLASSEMENT DU CONCOURS :
-${classement}
+MATCHS JOUÉS :
+${matchsDetails}
 
+PRONOS DÉTAILLÉS :
+${pronosDetails}
 
-
-Écris une analyse vivante et engagée, avec un titre accrocheur et des sous-titres. Parle des séries en cours et terminées, des pronos réussis et ratés, et des dynamiques du classement.`;     
-   
+CLASSEMENT :
+${classement}`;   
    };
 
    const fetchArticle = async () => {
