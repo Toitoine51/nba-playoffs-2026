@@ -40,6 +40,7 @@ function App() {
     const [articleLoading, setArticleLoading] = useState(false);
     const [articleError, setArticleError] = useState("");
     const [articlesList, setArticlesList] = useState([]); 
+    const [articleDate, setArticleDate] = useState(null);
 
     useEffect(() => {
         fetch("./pronos.json?v=1")
@@ -271,9 +272,11 @@ ${classement}`;
            if (json.text && json.date === targetDate) {
                // Article du jour existe
                setArticle(json.text);
+               setArticleDate(targetDate);  
            } else if (json.text && json.date !== targetDate && hour < 9) {
                // Avant 9h → afficher article de la veille
                setArticle(json.text);
+               setArticleDate(targetDate); 
            } else if (hour >= 9) {
                // Après 9h → générer
                const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
@@ -290,6 +293,7 @@ ${classement}`;
                        body: JSON.stringify({ text: mistralJson.text, date: targetDate })
                    });
                    setArticle(mistralJson.text);
+                   setArticleDate(targetDate); 
                } else {
                    setArticleError("Erreur Mistral : " + mistralJson.error);
                }
@@ -577,18 +581,34 @@ ${classement}`;
                </div>
                     {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
                      {articlesList.length > 1 && (
-                         <div style={{ marginBottom: 16 }}>
-                             <span style={{ color: "#fbbf24", fontSize: 13 }}>Anciens articles : </span>
-                             {articlesList.map(a => (
-                                 <button key={a.date} onClick={() => setArticle(a.text)} style={{ marginRight: 6, fontSize: 12 }}>
-                                     {new Date(a.date).toLocaleDateString("fr-FR")}
-                                 </button>
-                             ))}
-                         </div>
-                     )}
+                      <div style={{ marginBottom: 16 }}>
+                          <span style={{ color: "#fbbf24", fontSize: 13 }}>Anciens articles : </span>
+                          <select
+                              onChange={e => {
+                                  const found = articlesList.find(a => a.date === e.target.value);
+                                  if (found) {
+                                      setArticle(found.text);
+                                      setArticleDate(found.date);
+                                  }
+                              }}
+                              style={{ padding: 6, borderRadius: 6, border: "1px solid #444", background: "#1a2740", color: "white" }}
+                          >
+                              <option value="">-- choisir une date --</option>
+                              {articlesList.map(a => (
+                                  <option key={a.date} value={a.date}>
+                                      {new Date(a.date).toLocaleDateString("fr-FR")}
+                                  </option>
+                              ))}
+                          </select>
+                      </div>
+                  )}
                     {article && (
                    <div>
-                       <p style={{ color: "#fbbf24", fontSize: 13 }}>Article du {new Date().toLocaleDateString("fr-FR")}</p>
+                       {articleDate && (
+                            <p style={{ color: "#fbbf24", fontSize: 13 }}>
+                                Article du {new Date(articleDate).toLocaleDateString("fr-FR")}
+                            </p>
+                        )}
                        <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontFamily: "Georgia, serif" }}>
                            {article}
                        </div>
