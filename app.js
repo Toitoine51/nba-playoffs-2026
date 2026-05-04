@@ -66,11 +66,12 @@ function App() {
         saveResults(results);
     }, [results]);
 
-    useEffect(() => {
-       if (pronos.length > 0 && series.length > 0 && Object.keys(mapping).length > 0 && Object.keys(rawMatches).length > 0) {
+
+      useEffect(() => {
+       if (pronos.length > 0 && series.length > 0 && Object.keys(mapping).length > 0 && Object.keys(rawMatches).length > 0 && Object.keys(totals).length > 0) {
            fetchArticle();
        }
-   }, [pronos, series, mapping, rawMatches]);
+   }, [pronos, series, mapping, rawMatches, totals]);
 
     const fetchResults = async () => {
         setLoading(true);
