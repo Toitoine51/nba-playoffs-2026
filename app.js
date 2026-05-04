@@ -343,16 +343,17 @@ ${classement}
             )}
 
             {tab === "series" && (
-                <div style={{ overflowX: "auto", position: "relative"  }}>
+                <div style={{ overflowX: "auto"}}>
                     <table border="1" cellPadding="5" style={{ borderCollapse: "separate", borderSpacing: 0 }}>
                         <thead>
-                            <tr style={{ position: "sticky", top: 0 }}>
-                                <th style={{ position: "sticky", left: 0, zIndex: 2, background: "#1d428a" }}>Série</th>
-                                <th style={{ position: "sticky", left: 50, zIndex: 2, background: "#1d428a" }}>Score</th>
-                                {joueursTries.map(j => (
-                                    <th key={j}>{j}<br /><span style={{ color: "#c8102e", fontWeight: "bold" }}>{totals[j]}</span></th>
-                                ))}
-                            </tr>
+                           <tr>
+                               <th style={{ position: "sticky", left: 0, top: 0, zIndex: 3, background: "#1d428a" }}>Série</th>
+                               <th style={{ position: "sticky", left: 50, top: 0, zIndex: 3, background: "#1d428a" }}>Score</th>
+                               {joueursTries.map(j => (
+                                   <th key={j} style={{ position: "sticky", top: 0, background: "#1d428a" }}>{j}<br /><span style={{ color: "#c8102e", fontWeight: "bold" }}>{totals[j]}</span></th>
+                               ))}
+                           </tr>
+                           
                         </thead>
                         <tbody>
                             {[...series].sort((a, b) => {
