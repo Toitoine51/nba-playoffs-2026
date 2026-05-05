@@ -236,13 +236,16 @@ return `Nous sommes le ${new Date().toLocaleDateString("fr-FR")}.
 Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 5 amis.
 
 Structure de l'analyse :
-- Un paragraphe par série, en commençant par le tour 1. Fait bien un paragraphe par serie
-- Pour chaque série : parle des matchs joués, de l'état de la série, et des pronos des participants (bons coups, erreurs, surprises)
+- Un paragraphe par série, en commençant par le tour 1. Fait bien un paragraphe par serie. Ne fait pas trop long. 
+- Pour chaque série : 
+   . parle des matchs joués, de l'état de la série, et des pronos des participants (bons coups, erreurs, surprises).
+   . les pronos des participants sont la partie la plus importante.
 - Il faut que tu analyses aussi les pronos des joueurs pour voir qui est impacté par une élimination précoce d'une équipe qui a été pronostiquée pour aller loin par des participants.
-- Quand le tour 1 est terminé, passe au tour 2 avec juste un bref récap du tour 1
+- Insiste sur les derniers matchs qui se sont déroulés.
+- Tu ne parles que des séries qui ont des nouveaux matchs. Tu as la date. 
 - Conclus sur les tendances du classement : qui est bien parti, qui se rate
 
-Ton : amusant, décalé, comme entre amis. Pas de titre, pas de sous-titres. Texte continu.
+Ton : décalé, comme entre amis. Pas de titre, pas de sous-titres. Texte continu.
 
 RÉSULTATS DES SÉRIES :
 ${lignes}
