@@ -157,7 +157,9 @@ function App() {
         return { winsA, winsB, termine, gagnant, perdant, score };
     };
 
-const buildPrompt = (dateMax = null) => {
+const buildPrompt = async (dateMax = null) => {
+    const templateRes = await fetch("./prompt.txt?v=" + Date.now());
+    const template = await templateRes.text();
     const filteredMatches = dateMax
         ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
         : rawMatches;
@@ -231,32 +233,12 @@ const buildPrompt = (dateMax = null) => {
 
         const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
 
-return `Nous sommes le ${new Date().toLocaleDateString("fr-FR")}.
-
-Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 5 amis.
-Structure de l'analyse :
-- Un paragraphe par série. Fait bien un paragraphe par serie. Ne fait pas trop long. 
-- Tu ne parles que des séries qui ont des matchs joués lors des 2 derniers jours. 
-- Pour chaque série : 
-   . parle des matchs joués, de l'état de la série, et des pronos des participants (bons coups, erreurs, surprises).
-   . les pronos des participants sont la partie la plus importante.
-- Il faut que tu analyses aussi les pronos des joueurs pour voir qui est impacté par une élimination précoce d'une équipe qui a été pronostiquée pour aller loin par des participants.
-- Insiste sur les derniers matchs qui se sont déroulés.
-- Conclus sur les tendances du classement : qui est bien parti, qui se rate
-
-Ton : décalé, comme entre amis. Pas de titre, pas de sous-titres. Texte continu.
-
-RÉSULTATS DES SÉRIES :
-${lignes}
-
-MATCHS JOUÉS :
-${matchsDetails}
-
-PRONOS DÉTAILLÉS :
-${pronosDetails}
-
-CLASSEMENT :
-${classement}`;   
+    return template
+        .replace("{{DATE}}", new Date().toLocaleDateString("fr-FR"))
+        .replace("{{LIGNES}}", lignes)
+        .replace("{{MATCHS}}", matchsDetails)
+        .replace("{{PRONOS}}", pronosDetails)
+        .replace("{{CLASSEMENT}}", classement);
    };
 
    const fetchArticle = async (dateParam = null) => {
@@ -284,7 +266,7 @@ ${classement}`;
                const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
                    method: "POST",
                    headers: { "Content-Type": "application/json" },
-                   body: JSON.stringify({ prompt: buildPrompt(targetDate) }) 
+                   body: JSON.stringify({ prompt: await buildPrompt(targetDate) }) 
                });
                const mistralJson = await mistralRes.json();
                if (mistralJson.ok) {
@@ -630,5 +612,3 @@ ${classement}`;
 ReactDOM
     .createRoot(document.getElementById("root"))
     .render(<App />);
-
-
