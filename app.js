@@ -157,9 +157,7 @@ function App() {
         return { winsA, winsB, termine, gagnant, perdant, score };
     };
 
-const buildPrompt = async (dateMax = null) => {
-    const templateRes = await fetch("./prompt.txt?v=" + Date.now());
-    const template = await templateRes.text();
+const buildPrompt = (dateMax = null) => {
     const filteredMatches = dateMax
         ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
         : rawMatches;
@@ -233,56 +231,81 @@ const buildPrompt = async (dateMax = null) => {
 
         const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
 
-    return template
-        .replace("{{DATE}}", new Date().toLocaleDateString("fr-FR"))
-        .replace("{{LIGNES}}", lignes)
-        .replace("{{MATCHS}}", matchsDetails)
-        .replace("{{PRONOS}}", pronosDetails)
-        .replace("{{CLASSEMENT}}", classement);
+return `Nous sommes le ${new Date().toLocaleDateString("fr-FR")}.
+
+Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 5 amis.
+Structure de l'analyse :
+- Un paragraphe par série. Fait bien un paragraphe par serie. Ne fait pas trop long. 
+- Tu ne parles que des séries qui ont des matchs joués lors des 2 derniers jours. 
+- Pour chaque série : 
+   . parle des matchs joués, de l'état de la série, et des pronos des participants (bons coups, erreurs, surprises).
+   . les pronos des participants sont la partie la plus importante.
+- Il faut que tu analyses aussi les pronos des joueurs pour voir qui est impacté par une élimination précoce d'une équipe qui a été pronostiquée pour aller loin par des participants.
+- Insiste sur les derniers matchs qui se sont déroulés.
+- Conclus sur les tendances du classement : qui est bien parti, qui se rate
+
+Ton : décalé, comme entre amis. Pas de titre, pas de sous-titres. Texte continu.
+
+RÉSULTATS DES SÉRIES :
+${lignes}
+
+MATCHS JOUÉS :
+${matchsDetails}
+
+PRONOS DÉTAILLÉS :
+${pronosDetails}
+
+CLASSEMENT :
+${classement}`;   
    };
 
    const fetchArticle = async (dateParam = null) => {
        const today = new Date().toISOString().slice(0, 10);
        const targetDate = dateParam || today;
+       const forcedDate = dateParam !== null;
        console.log("fetchArticle called, hour:", new Date().getHours());
        try {
-           // 1. Vérifier si article du jour existe dans KV
-           const res = await fetch("https://syncnba.toitoine51.workers.dev/article");
-           const json = await res.json();
-   
            const hour = new Date().getHours();
-           
-   
-           if (json.text && json.date === targetDate) {
-               // Article du jour existe
-               setArticle(json.text);
-               setArticleDate(targetDate);  
-           } else if (json.text && json.date !== targetDate && hour < 9) {
-               // Avant 9h → afficher article de la veille
-               setArticle(json.text);
-               setArticleDate(targetDate); 
-           } else if (hour >= 9) {
-               // Après 9h → générer
-               const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
+
+           if (!forcedDate) {
+               const res = await fetch("https://syncnba.toitoine51.workers.dev/article");
+               const json = await res.json();
+
+               if (json.text && json.date === targetDate) {
+                   setArticle(json.text);
+                   setArticleDate(targetDate);
+                   setArticleLoading(false);
+                   return;
+               } else if (json.text && json.date !== targetDate && hour < 9) {
+                   setArticle(json.text);
+                   setArticleDate(json.date);
+                   setArticleLoading(false);
+                   return;
+               } else if (hour < 9) {
+                   setArticleError("Pas d'article disponible avant 9h.");
+                   setArticleLoading(false);
+                   return;
+               }
+           }
+
+           // Génération (forcée ou automatique après 9h)
+           const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({ prompt: await buildPrompt(targetDate) })
+           });
+           const mistralJson = await mistralRes.json();
+           if (mistralJson.ok) {
+               await fetch("https://syncnba.toitoine51.workers.dev/article", {
                    method: "POST",
                    headers: { "Content-Type": "application/json" },
-                   body: JSON.stringify({ prompt: await buildPrompt(targetDate) }) 
+                   body: JSON.stringify({ text: mistralJson.text, date: targetDate })
                });
-               const mistralJson = await mistralRes.json();
-               if (mistralJson.ok) {
-                   // Stocker dans KV
-                   await fetch("https://syncnba.toitoine51.workers.dev/article", {
-                       method: "POST",
-                       headers: { "Content-Type": "application/json" },
-                       body: JSON.stringify({ text: mistralJson.text, date: targetDate })
-                   });
-                   setArticle(mistralJson.text);
-                   setArticleDate(targetDate); 
-               } else {
-                   setArticleError("Erreur Mistral : " + mistralJson.error);
-               }
+               setArticle(mistralJson.text);
+               setArticleDate(targetDate);
+               fetchArticlesList();
            } else {
-               setArticleError("Pas d'article disponible avant 9h.");
+               setArticleError("Erreur LLM : " + mistralJson.error);
            }
        } catch (e) {
            setArticleError("Erreur réseau : " + e.message);
@@ -550,7 +573,7 @@ const buildPrompt = async (dateMax = null) => {
     {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
 
-       {true && (
+       {false && (
                <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
                    <input
                        type="date"
