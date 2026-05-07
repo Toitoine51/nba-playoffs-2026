@@ -550,7 +550,7 @@ const buildPrompt = async (dateMax = null) => {
     {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
 
-       {false && (
+       {true && (
                <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
                    <input
                        type="date"
