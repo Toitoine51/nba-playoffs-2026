@@ -1,6 +1,15 @@
 const { useState, useEffect, useMemo } = React;
 
 /* ======================
+   HEADERS API
+====================== */
+
+const API_HEADERS = {
+  "Content-Type": "application/json",
+  "x-api-key": CONFIG.API_KEY
+};
+
+/* ======================
    STORAGE (SAFE)
 ====================== */
 
@@ -39,7 +48,7 @@ function App() {
     const [article, setArticle] = useState("");
     const [articleLoading, setArticleLoading] = useState(false);
     const [articleError, setArticleError] = useState("");
-    const [articlesList, setArticlesList] = useState([]); 
+    const [articlesList, setArticlesList] = useState([]);
     const [articleDate, setArticleDate] = useState(null);
 
     useEffect(() => {
@@ -68,20 +77,22 @@ function App() {
         saveResults(results);
     }, [results]);
 
-
-      useEffect(() => {
-       if (pronos.length > 0 && series.length > 0 && Object.keys(mapping).length > 0 && Object.keys(rawMatches).length > 0 && Object.keys(totals).length > 0) {
-           fetchArticle();
-           fetchArticlesList();   
-          
-       }
-   }, [pronos, series, mapping, rawMatches, totals]);
+    useEffect(() => {
+        if (pronos.length > 0 && series.length > 0 && Object.keys(mapping).length > 0 && Object.keys(rawMatches).length > 0 && Object.keys(totals).length > 0) {
+            fetchArticle();
+            fetchArticlesList();
+        }
+    }, [pronos, series, mapping, rawMatches, totals]);
 
     const fetchResults = async () => {
         setLoading(true);
         try {
-            await fetch("https://syncnba.toitoine51.workers.dev/");
-            const res = await fetch("https://syncnba.toitoine51.workers.dev/state");
+            await fetch("https://syncnba.toitoine51.workers.dev/", {
+                headers: API_HEADERS
+            });
+            const res = await fetch("https://syncnba.toitoine51.workers.dev/state", {
+                headers: API_HEADERS
+            });
             const json = await res.json();
             const newMatches = {};
             (json.events || []).forEach(ev => {
@@ -157,182 +168,184 @@ function App() {
         return { winsA, winsB, termine, gagnant, perdant, score };
     };
 
-const buildPrompt = async (dateMax = null) => {
-    const templateRes = await fetch("./prompt.txt?v=" + Date.now());
-    const template = await templateRes.text();
+    const buildPrompt = async (dateMax = null) => {
+        const templateRes = await fetch("./prompt.txt?v=" + Date.now());
+        const template = await templateRes.text();
 
-    const filteredMatches = dateMax
-        ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
-        : rawMatches;
+        const filteredMatches = dateMax
+            ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
+            : rawMatches;
 
-    // Séries ayant eu des matchs dans les 2 derniers jours avant dateMax
-    const dateRef = dateMax ? new Date(dateMax) : new Date();
-    const dateMinus2 = new Date(dateRef);
-    dateMinus2.setDate(dateMinus2.getDate() - 1);
-    const dateMin = dateMinus2.toISOString().slice(0, 10);
+        const dateRef = dateMax ? new Date(dateMax) : new Date();
+        const dateMinus2 = new Date(dateRef);
+        dateMinus2.setDate(dateMinus2.getDate() - 1);
+        const dateMin = dateMinus2.toISOString().slice(0, 10);
 
-    const seriesActives = series.filter(s => {
-        const normalize = (abbr) => mapping[abbr] || abbr;
-        return Object.values(filteredMatches).some(m => {
-            const a = normalize(m.team_a);
-            const b = normalize(m.team_b);
-            return (
-                m.status === "Final" &&
-                m.date >= dateMin &&
-                ((a === s.team_a && b === s.team_b) ||
-                 (a === s.team_b && b === s.team_a))
-            );
+        const seriesActives = series.filter(s => {
+            const normalize = (abbr) => mapping[abbr] || abbr;
+            return Object.values(filteredMatches).some(m => {
+                const a = normalize(m.team_a);
+                const b = normalize(m.team_b);
+                return (
+                    m.status === "Final" &&
+                    m.date >= dateMin &&
+                    ((a === s.team_a && b === s.team_b) ||
+                     (a === s.team_b && b === s.team_a))
+                );
+            });
         });
-    });
 
-    const calcSerieFiltered = (serie) => {
-        const normalize = (abbr) => mapping[abbr] || abbr;
-        const matchs = Object.values(filteredMatches).filter(m => {
-            const a = normalize(m.team_a);
-            const b = normalize(m.team_b);
-            return (
-                m.status === "Final" &&
-                ((a === serie.team_a && b === serie.team_b) ||
-                 (a === serie.team_b && b === serie.team_a))
-            );
-        });
-        let winsA = 0, winsB = 0;
-        matchs.forEach(m => {
-            const [scoreA, scoreB] = m.score.split("-").map(Number);
-            const a = normalize(m.team_a);
-            if (scoreA > scoreB) { if (a === serie.team_a) winsA++; else winsB++; }
-            else { if (a === serie.team_a) winsB++; else winsA++; }
-        });
-        const termine = winsA === 4 || winsB === 4;
-        const gagnant = winsA === 4 ? serie.team_a : winsB === 4 ? serie.team_b : null;
-        const perdant = winsA === 4 ? serie.team_b : winsB === 4 ? serie.team_a : null;
-        const score = termine ? `${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}` : null;
-        return { winsA, winsB, termine, gagnant, perdant, score };
+        const calcSerieFiltered = (serie) => {
+            const normalize = (abbr) => mapping[abbr] || abbr;
+            const matchs = Object.values(filteredMatches).filter(m => {
+                const a = normalize(m.team_a);
+                const b = normalize(m.team_b);
+                return (
+                    m.status === "Final" &&
+                    ((a === serie.team_a && b === serie.team_b) ||
+                     (a === serie.team_b && b === serie.team_a))
+                );
+            });
+            let winsA = 0, winsB = 0;
+            matchs.forEach(m => {
+                const [scoreA, scoreB] = m.score.split("-").map(Number);
+                const a = normalize(m.team_a);
+                if (scoreA > scoreB) { if (a === serie.team_a) winsA++; else winsB++; }
+                else { if (a === serie.team_a) winsB++; else winsA++; }
+            });
+            const termine = winsA === 4 || winsB === 4;
+            const gagnant = winsA === 4 ? serie.team_a : winsB === 4 ? serie.team_b : null;
+            const perdant = winsA === 4 ? serie.team_b : winsB === 4 ? serie.team_a : null;
+            const score = termine ? `${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}` : null;
+            return { winsA, winsB, termine, gagnant, perdant, score };
+        };
+
+        const lignes = seriesActives.map(s => {
+            const sc = calcSerieFiltered(s);
+            const statut = sc.termine
+                ? `TERMINÉE : ${sc.gagnant} bat ${sc.perdant} ${sc.score}`
+                : `En cours : ${s.team_a} ${sc.winsA}-${sc.winsB} ${s.team_b}`;
+            return `- ${s.id} (${s.conf}) : ${statut}`;
+        }).join("\n");
+
+        const pronosDetails = seriesActives.map(s => {
+            const sc = calcSerieFiltered(s);
+            const ligneJoueurs = joueurs.map(j => {
+                const prono = pronos.find(p => p.joueur === j && p.match_id === s.id);
+                if (!prono) return `  ${j}: pas de prono`;
+                let resultat = "";
+                if (sc.termine) {
+                    const bonGagnant = prono.gagnant === sc.gagnant;
+                    const bonPerdant = bonGagnant && prono.perdant === sc.perdant;
+                    const bonScore = bonGagnant && prono.score === sc.score;
+                    resultat = ` → ${bonGagnant ? "✓ gagnant" : "✗ gagnant"} ${bonPerdant ? "✓ perdant" : "✗ perdant"} ${bonScore ? "✓ score" : "✗ score"}`;
+                }
+                return `  ${j}: ${prono.gagnant} bat ${prono.perdant} ${prono.score}${resultat}`;
+            }).join("\n");
+            return `${s.id} (${s.conf}) :\n${ligneJoueurs}`;
+        }).join("\n\n");
+
+        const matchsDetails = seriesActives.map(s => {
+            const normalize = (abbr) => mapping[abbr] || abbr;
+            const matchs = Object.values(filteredMatches).filter(m => {
+                const a = normalize(m.team_a);
+                const b = normalize(m.team_b);
+                return (
+                    m.status === "Final" &&
+                    ((a === s.team_a && b === s.team_b) ||
+                     (a === s.team_b && b === s.team_a))
+                );
+            }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (matchs.length === 0) return `${s.id} : pas de match joué`;
+            const lignes = matchs.map((m, i) => `  Match ${i+1} (${m.date}) : ${m.team_a} ${m.score} ${m.team_b}`).join("\n");
+            return `${s.id} :\n${lignes}`;
+        }).join("\n\n");
+
+        const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
+
+        return template
+            .replace("{{DATE}}", dateRef.toLocaleDateString("fr-FR"))
+            .replace("{{LIGNES}}", lignes)
+            .replace("{{MATCHS}}", matchsDetails)
+            .replace("{{PRONOS}}", pronosDetails)
+            .replace("{{CLASSEMENT}}", classement);
     };
 
-    const lignes = seriesActives.map(s => {
-        const sc = calcSerieFiltered(s);
-        const statut = sc.termine
-            ? `TERMINÉE : ${sc.gagnant} bat ${sc.perdant} ${sc.score}`
-            : `En cours : ${s.team_a} ${sc.winsA}-${sc.winsB} ${s.team_b}`;
-        return `- ${s.id} (${s.conf}) : ${statut}`;
-    }).join("\n");
+    const fetchArticle = async (dateParam = null) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const targetDate = dateParam || today;
+        const forcedDate = dateParam !== null;
+        console.log("fetchArticle called, hour:", new Date().getHours());
+        try {
+            const hour = new Date().getHours();
 
-    const pronosDetails = seriesActives.map(s => {
-        const sc = calcSerieFiltered(s);
-        const ligneJoueurs = joueurs.map(j => {
-            const prono = pronos.find(p => p.joueur === j && p.match_id === s.id);
-            if (!prono) return `  ${j}: pas de prono`;
-            let resultat = "";
-            if (sc.termine) {
-                const bonGagnant = prono.gagnant === sc.gagnant;
-                const bonPerdant = bonGagnant && prono.perdant === sc.perdant;
-                const bonScore = bonGagnant && prono.score === sc.score;
-                resultat = ` → ${bonGagnant ? "✓ gagnant" : "✗ gagnant"} ${bonPerdant ? "✓ perdant" : "✗ perdant"} ${bonScore ? "✓ score" : "✗ score"}`;
+            if (!forcedDate) {
+                const res = await fetch("https://syncnba.toitoine51.workers.dev/article", {
+                    headers: API_HEADERS
+                });
+                const json = await res.json();
+
+                if (json.text && json.date === targetDate) {
+                    setArticle(json.text);
+                    setArticleDate(targetDate);
+                    setArticleLoading(false);
+                    return;
+                } else if (json.text && json.date !== targetDate && hour < 9) {
+                    setArticle(json.text);
+                    setArticleDate(json.date);
+                    setArticleLoading(false);
+                    return;
+                } else if (hour < 9) {
+                    setArticleError("Pas d'article disponible avant 9h.");
+                    setArticleLoading(false);
+                    return;
+                }
             }
-            return `  ${j}: ${prono.gagnant} bat ${prono.perdant} ${prono.score}${resultat}`;
-        }).join("\n");
-        return `${s.id} (${s.conf}) :\n${ligneJoueurs}`;
-    }).join("\n\n");
 
-    const matchsDetails = seriesActives.map(s => {
-        const normalize = (abbr) => mapping[abbr] || abbr;
-        const matchs = Object.values(filteredMatches).filter(m => {
-            const a = normalize(m.team_a);
-            const b = normalize(m.team_b);
-            return (
-                m.status === "Final" &&
-                ((a === s.team_a && b === s.team_b) ||
-                 (a === s.team_b && b === s.team_a))
-            );
-        }).sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        if (matchs.length === 0) return `${s.id} : pas de match joué`;
-        const lignes = matchs.map((m, i) => `  Match ${i+1} (${m.date}) : ${m.team_a} ${m.score} ${m.team_b}`).join("\n");
-        return `${s.id} :\n${lignes}`;
-    }).join("\n\n");
-
-    const classement = joueursTries.map((j, i) => `${i+1}. ${j} : ${totals[j]} pts`).join("\n");
-
-    return template
-        .replace("{{DATE}}", dateRef.toLocaleDateString("fr-FR"))
-        .replace("{{LIGNES}}", lignes)
-        .replace("{{MATCHS}}", matchsDetails)
-        .replace("{{PRONOS}}", pronosDetails)
-        .replace("{{CLASSEMENT}}", classement);
-};
-
-const fetchArticle = async (dateParam = null) => {
-    const today = new Date().toISOString().slice(0, 10);
-    const targetDate = dateParam || today;
-    const forcedDate = dateParam !== null;
-    console.log("fetchArticle called, hour:", new Date().getHours());
-    try {
-        const hour = new Date().getHours();
-
-        if (!forcedDate) {
-            const res = await fetch("https://syncnba.toitoine51.workers.dev/article");
-            const json = await res.json();
-
-            if (json.text && json.date === targetDate) {
-                setArticle(json.text);
-                setArticleDate(targetDate);
-                setArticleLoading(false);
-                return;
-            } else if (json.text && json.date !== targetDate && hour < 9) {
-                setArticle(json.text);
-                setArticleDate(json.date);
-                setArticleLoading(false);
-                return;
-            } else if (hour < 9) {
-                setArticleError("Pas d'article disponible avant 9h.");
+            const prompt = await buildPrompt(targetDate);
+            if (!prompt) {
+                setArticleError("Pas de match cette nuit.");
                 setArticleLoading(false);
                 return;
             }
-        }
-
-        // Génération (forcée ou automatique après 9h)
-        const prompt = await buildPrompt(targetDate);
-        if (!prompt) {
-            setArticleError("Pas de match cette nuit.");
-            setArticleLoading(false);
-            return;
-        }
-        const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt })
-        });
-        const mistralJson = await mistralRes.json();
-        if (mistralJson.ok) {
-            await fetch("https://syncnba.toitoine51.workers.dev/article", {
+            const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: mistralJson.text, date: targetDate })
+                headers: API_HEADERS,
+                body: JSON.stringify({ prompt })
             });
-            setArticle(mistralJson.text);
-            setArticleDate(targetDate);
-            fetchArticlesList();
-        } else {
-            setArticleError("Erreur Mistral : " + mistralJson.error);
+            const mistralJson = await mistralRes.json();
+            if (mistralJson.ok) {
+                await fetch("https://syncnba.toitoine51.workers.dev/article", {
+                    method: "POST",
+                    headers: API_HEADERS,
+                    body: JSON.stringify({ text: mistralJson.text, date: targetDate })
+                });
+                setArticle(mistralJson.text);
+                setArticleDate(targetDate);
+                fetchArticlesList();
+            } else {
+                setArticleError("Erreur Mistral : " + mistralJson.error);
+            }
+        } catch (e) {
+            setArticleError("Erreur réseau : " + e.message);
         }
-    } catch (e) {
-        setArticleError("Erreur réseau : " + e.message);
-    }
-    setArticleLoading(false);
-};
+        setArticleLoading(false);
+    };
 
-   const fetchArticlesList = async () => {
-       try {
-           const res = await fetch("https://syncnba.toitoine51.workers.dev/articles");
-           const json = await res.json();
-           if (json.ok) {
-               setArticlesList(json.articles.sort((a, b) => b.date.localeCompare(a.date)));
-           }
-       } catch (e) {
-           console.error("fetchArticlesList error", e);
-       }
-   };
+    const fetchArticlesList = async () => {
+        try {
+            const res = await fetch("https://syncnba.toitoine51.workers.dev/articles", {
+                headers: API_HEADERS
+            });
+            const json = await res.json();
+            if (json.ok) {
+                setArticlesList(json.articles.sort((a, b) => b.date.localeCompare(a.date)));
+            }
+        } catch (e) {
+            console.error("fetchArticlesList error", e);
+        }
+    };
 
     const joueurs = ["Guilhem", "Ousset", "Jeff", "Daude", "Antoine"];
 
@@ -484,7 +497,6 @@ const fetchArticle = async (dateParam = null) => {
                                    <th key={j} style={{ position: "sticky", top: 0, background: "#1d428a" }}>{j}<br /><span style={{ color: "#c8102e", fontWeight: "bold" }}>{totals[j]}</span></th>
                                ))}
                            </tr>
-                           
                         </thead>
                         <tbody>
                             {[...series].sort((a, b) => {
@@ -545,7 +557,6 @@ const fetchArticle = async (dateParam = null) => {
                 </div>
             )}
 
-
             {tab === "regles" && (
                 <div style={{ padding: 10, maxWidth: 600 }}>
                     <h2>Calcul des points</h2>
@@ -578,67 +589,64 @@ const fetchArticle = async (dateParam = null) => {
                 </div>
             )}
 
-
-    {tab === "article" && (
+            {tab === "article" && (
                 <div style={{ padding: 10, maxWidth: 700 }}>
-
-       {false && (
-               <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
-                   <input
-                       type="date"
-                       id="articleDate"
-                       defaultValue={new Date().toISOString().slice(0, 10)}
-                       style={{ padding: 6, borderRadius: 6, border: "1px solid #444", background: "#1a2740", color: "white" }}
-                   />
-                   <button onClick={() => {
-                       const date = document.getElementById("articleDate").value;
-                       fetchArticle(date);
-                   }}>
-                       Générer pour cette date
-                   </button>
-               </div>
-)}
+                    {false && (
+                        <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+                            <input
+                                type="date"
+                                id="articleDate"
+                                defaultValue={new Date().toISOString().slice(0, 10)}
+                                style={{ padding: 6, borderRadius: 6, border: "1px solid #444", background: "#1a2740", color: "white" }}
+                            />
+                            <button onClick={() => {
+                                const date = document.getElementById("articleDate").value;
+                                fetchArticle(date);
+                            }}>
+                                Générer pour cette date
+                            </button>
+                        </div>
+                    )}
                     {articleError && <p style={{ color: "#ff4444" }}>{articleError}</p>}
-                     {articlesList.length > 1 && (
-                      <div style={{ marginBottom: 16 }}>
-                          <span style={{ color: "#fbbf24", fontSize: 13 }}>Anciens articles : </span>
-                          <select
-                              onChange={e => {
-                                  const found = articlesList.find(a => a.date === e.target.value);
-                                  if (found) {
-                                      setArticle(found.text);
-                                      setArticleDate(found.date);
-                                  }
-                              }}
-                              style={{ padding: 6, borderRadius: 6, border: "1px solid #444", background: "#1a2740", color: "white" }}
-                          >
-                              <option value="">-- choisir une date --</option>
-                              {articlesList.map(a => (
-                                  <option key={a.date} value={a.date}>
-                                      {new Date(a.date).toLocaleDateString("fr-FR")}
-                                  </option>
-                              ))}
-                          </select>
-                      </div>
-                  )}
+                    {articlesList.length > 1 && (
+                        <div style={{ marginBottom: 16 }}>
+                            <span style={{ color: "#fbbf24", fontSize: 13 }}>Anciens articles : </span>
+                            <select
+                                onChange={e => {
+                                    const found = articlesList.find(a => a.date === e.target.value);
+                                    if (found) {
+                                        setArticle(found.text);
+                                        setArticleDate(found.date);
+                                    }
+                                }}
+                                style={{ padding: 6, borderRadius: 6, border: "1px solid #444", background: "#1a2740", color: "white" }}
+                            >
+                                <option value="">-- choisir une date --</option>
+                                {articlesList.map(a => (
+                                    <option key={a.date} value={a.date}>
+                                        {new Date(a.date).toLocaleDateString("fr-FR")}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                     {article && (
-                   <div>
-                       {articleDate && (
-                            <p style={{ color: "#fbbf24", fontSize: 13 }}>
-                                Article du {new Date(articleDate).toLocaleDateString("fr-FR")}
-                            </p>
-                        )}
-                       <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontFamily: "Georgia, serif" }}>
-                           {article}
-                       </div>
-                   </div>
-               )}
+                        <div>
+                            {articleDate && (
+                                <p style={{ color: "#fbbf24", fontSize: 13 }}>
+                                    Article du {new Date(articleDate).toLocaleDateString("fr-FR")}
+                                </p>
+                            )}
+                            <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontFamily: "Georgia, serif" }}>
+                                {article}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
         </div>
     );
-
 }
 
 ReactDOM
