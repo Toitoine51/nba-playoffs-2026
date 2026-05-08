@@ -1,25 +1,2 @@
-Todo
-1. syncnba (~20 lignes)
-GET /article?date=2026-05-03 → retourne l'article du jour depuis KV
-POST /article → reçoit et stocke l'article avec la date
-GET /articles → liste tous les articles stockés
-2. app.js (~30 lignes)
-Au chargement : appelle GET /article
-Article du jour existe → affiche directement
-Pas d'article + avant 9h → affiche article de la veille
-Pas d'article + après 9h → génère via Mistral → envoie à POST /article → affiche
-Supprimer le bouton "Générer"
-Afficher liste des anciens articles cliquables
-3. Prompt (plus tard)
-Un paragraphe par série avec infos matchs
-Structure par tour
-Ton amusant
-Conclusion tendances
-4. Mobile (plus tard)
-Optimiser tableaux et mise en page
-Reformatage mobile
-Barre de boutons : flexWrap: "wrap" + sticky en haut
-Tableau classement : colonnes "Série" et "Score" sticky à gauche
-Ligne de titre : sticky en haut du tableau
-~30 min, tout dans app.js et style.css.
-
+c'est bon
+Il faudra ajouter, dans series.json, les matchs pour les finales de conf et enfin apres la finale
