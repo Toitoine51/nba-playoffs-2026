@@ -5,8 +5,7 @@ const { useState, useEffect, useMemo } = React;
 ====================== */
 
 const API_HEADERS = {
-  "Content-Type": "application/json",
-  "x-api-key": CONFIG.API_KEY
+  "Content-Type": "application/json"
 };
 
 /* ======================
