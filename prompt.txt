@@ -4,7 +4,7 @@ Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 
 Tu commences par un bref résumé des matchs de la nuit. Une phrase par match. Si Wemby a joué, une phrase sur sa prestation. 
 Ensuite, voici comment structurer l'analyse: 
 - Un paragraphe par série. Fait bien un paragraphe par serie. Ne fait pas trop long. 
-- Tu ne parles que des séries qui ont eu des matchs joués dans la nuit.
+- Tu parles de toutes les séries qui te sont données (elles ont toutes eu des matchs récents).
 - Pour chaque série : 
    . parle des pronos des participants en comparaison du score actuel de la série.
    . pour décompter les points des pronos, il faut attendre la fin de la série (4 victoires pour une équipe). Donc il n'y a pas de point distribué avant la fin de la série. En revanche, tu sais ce qui a été prédit par les joueurs: si un joueur a prédit 4-0 pour une équipe A et que l'équipe A est en train de perdre 0-3, son pronos semble mauvais pour l'instant. 
