@@ -168,7 +168,7 @@ const buildPrompt = async (dateMax = null) => {
     // Séries ayant eu des matchs dans les 2 derniers jours avant dateMax
     const dateRef = dateMax ? new Date(dateMax) : new Date();
     const dateMinus2 = new Date(dateRef);
-    dateMinus2.setDate(dateMinus2.getDate() - 2);
+    dateMinus2.setDate(dateMinus2.getDate() - 1);
     const dateMin = dateMinus2.toISOString().slice(0, 10);
 
     const seriesActives = series.filter(s => {
