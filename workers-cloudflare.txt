@@ -1,0 +1,455 @@
+gemini
+
+//gemini
+export default {
+  async fetch(request, env) {
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const body = await request.json();
+      const prompt = body.prompt;
+
+      // Gemini utilise une URL avec la clé API directement en paramètre
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_KEY}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: prompt }]
+          }]
+        })
+      });
+
+      const json = await res.json();
+      
+      // Extraction du texte spécifique à la structure Google Gemini
+      const text = json.candidates?.[0]?.content?.parts?.[0]?.text || "Pas de réponse";
+
+      return new Response(JSON.stringify({ ok: true, text }), { headers: corsHeaders });
+
+    } catch (e) {
+      return new Response(JSON.stringify({ ok: false, error: e.message }), { headers: corsHeaders });
+    }
+  }
+};
+
+
+//mistral
+/*
+export default {
+  async fetch(request, env) {
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const body = await request.json();
+      const prompt = body.prompt;
+
+      const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${env.MISTRAL_KEY}`
+        },
+        body: JSON.stringify({
+          model: "mistral-small-latest",
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const json = await res.json();
+      const text = json.choices?.[0]?.message?.content || "Pas de réponse";
+
+      return new Response(JSON.stringify({ ok: true, text }), { headers: corsHeaders });
+
+    } catch (e) {
+      return new Response(JSON.stringify({ ok: false, error: e.message }), { headers: corsHeaders });
+    }
+  }
+};
+*/
+
+//openrouter ai
+/*
+export default {
+  async fetch(request, env) {
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const body = await request.json();
+      const prompt = body.prompt;
+
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${env.OPENROUTER_KEY}`
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-oss-20b:free",
+          messages: [{ role: "user", content: prompt }]
+        })
+        //models "meta-llama/llama-3.3-70b-instruct" "google/gemini-flash-1.5"
+      });
+
+      const json = await res.json();
+      const text = json.choices?.[0]?.message?.content || "Pas de réponse";
+
+      return new Response(JSON.stringify({ ok: true, text }), { headers: corsHeaders });
+
+    } catch (e) {
+      return new Response(JSON.stringify({ ok: false, error: e.message }), { headers: corsHeaders });
+    }
+  }
+};
+*/
+
+/*
+//groq ai
+export default {
+  async fetch(request, env) {
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const body = await request.json();
+      const prompt = body.prompt;
+
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${env.OPENROUTER_KEY}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const json = await res.json();
+      const text = json.choices?.[0]?.message?.content || "Pas de réponse";
+
+      return new Response(JSON.stringify({ ok: true, text }), { headers: corsHeaders });
+
+    } catch (e) {
+      return new Response(JSON.stringify({ ok: false, error: e.message }), { headers: corsHeaders });
+    }
+  }
+};
+*/
+
+
+
+----------------------------------------------------------------------------------------
+syncnba
+----------------------------------------------------------------------------------------
+
+/**
+ * Welcome to Cloudflare Workers! This is your first worker.
+ *
+ * - Run "npm run dev" in your terminal to start a development server
+ * - Open a browser tab at http://localhost:8787/ to see your worker in action
+ * - Run "npm run deploy" to publish your worker
+ *
+ * Learn more at https://developers.cloudflare.com/workers/
+ 
+
+export default {
+  async fetch(request, env, ctx) {
+    // You can view your logs in the Observability dashboard
+    console.info({ message: 'Hello World Worker received a request!' }); 
+    return new Response('Hello World!');
+  }
+};
+*/
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Content-Type": "application/json"
+};
+
+export default {
+  async fetch(request, env) {
+
+    const path = new URL(request.url).pathname;
+
+    if (request.method === "OPTIONS") {
+    return new Response(null, {
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST",
+            "Access-Control-Allow-Headers": "Content-Type"
+        }
+    });
+}
+
+if (path === "/article") {
+  if (request.method === "POST") {
+    const body = await request.json();
+    const date = body.date || new Date().toISOString().slice(0, 10);
+    await env.NBA_KV.put(`article:${date}`, body.text);
+    return new Response(JSON.stringify({ ok: true }), { headers: corsHeaders });
+  }
+  if (request.method === "GET") {
+    const date = new Date().toISOString().slice(0, 10);
+    const text = await env.NBA_KV.get(`article:${date}`);
+    if (!text) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yDate = yesterday.toISOString().slice(0, 10);
+      const yText = await env.NBA_KV.get(`article:${yDate}`);
+      return new Response(JSON.stringify({ ok: true, text: yText || null, date: yDate }), { headers: corsHeaders });
+    }
+    return new Response(JSON.stringify({ ok: true, text, date }), { headers: corsHeaders });
+  }
+}
+
+
+    if (path === "/article") {
+      if (request.method === "POST") {
+        const body = await request.json();
+        const date = new Date().toISOString().slice(0, 10);
+        await env.NBA_KV.put(`article:${date}`, body.text);
+        return new Response(JSON.stringify({ ok: true }), { headers: corsHeaders });
+      }
+      if (request.method === "GET") {
+        const date = new Date().toISOString().slice(0, 10);
+        const text = await env.NBA_KV.get(`article:${date}`);
+        if (!text) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yDate = yesterday.toISOString().slice(0, 10);
+          const yText = await env.NBA_KV.get(`article:${yDate}`);
+          return new Response(JSON.stringify({ ok: true, text: yText || null, date: yDate }), { headers: corsHeaders });
+        }
+        return new Response(JSON.stringify({ ok: true, text, date }), { headers: corsHeaders });
+      }
+    }
+
+    if (path === "/articles") {
+      const list = await env.NBA_KV.list({ prefix: "article:" });
+      const articles = await Promise.all(
+        list.keys.map(async k => ({
+          date: k.name.replace("article:", ""),
+          text: await env.NBA_KV.get(k.name)
+        }))
+      );
+      return new Response(JSON.stringify({ ok: true, articles }), { headers: corsHeaders });
+    }
+
+
+    if (path === "/state") {
+      let state = await env.NBA_KV.get("state");
+      state = state ? JSON.parse(state) : { matches: {} };
+
+      return new Response(JSON.stringify({
+        ok: true,
+        events: Object.values(state.matches || {})
+      }), { headers: corsHeaders });
+    }
+
+    let state = await env.NBA_KV.get("state");
+    state = state ? JSON.parse(state) : { matches: {}, lastDate: "20260418" };
+
+    let matches = state.matches || {};
+    let currentDate = state.lastDate || "20260418";
+
+    const today = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+
+    let steps = 0;
+    const log = [];
+
+    while (currentDate < today && steps < 120) {
+
+      const targetUrl = new URL("https://scrap.internal");
+      targetUrl.searchParams.set("start", currentDate);
+      targetUrl.searchParams.set("days", "3");
+      targetUrl.searchParams.set("key", "nba_sync_2026");
+
+      let data;
+      try {
+        const res = await env.SCRAP.fetch(targetUrl.toString());
+        const text = await res.text();
+        data = JSON.parse(text);
+      } catch (e) {
+        return new Response(JSON.stringify({
+          ok: false,
+          error: "fetch/parse failed",
+          detail: e.message,
+          step: steps,
+          currentDate
+        }), { headers: corsHeaders });
+      }
+
+      if (!data.ok || !Array.isArray(data.events)) {
+        return new Response(JSON.stringify({
+          ok: false, error: "scrap invalid", raw: data, currentDate
+        }), { headers: corsHeaders });
+      }
+
+      log.push({ date: currentDate, count: data.events.length });
+
+      for (const ev of data.events) {
+        matches[ev.match_id] = ev;
+      }
+
+      const d = new Date(
+        currentDate.slice(0, 4) + "-" +
+        currentDate.slice(4, 6) + "-" +
+        currentDate.slice(6, 8)
+      );
+      d.setDate(d.getDate() + 1);
+      currentDate = d.toISOString().slice(0, 10).replaceAll("-", "");
+      steps++;
+    }
+
+    await env.NBA_KV.put("state", JSON.stringify({ matches, lastDate: currentDate }));
+
+    return new Response(JSON.stringify({
+      ok: true,
+      matches: Object.keys(matches).length,
+      lastDate: currentDate,
+      log
+    }), { headers: corsHeaders });
+  }
+};
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+scrap
+
+
+/**
+ * Welcome to Cloudflare Workers! This is your first worker.
+ *
+ * - Run "npm run dev" in your terminal to start a development server
+ * - Open a browser tab at http://localhost:8787/ to see your worker in action
+ * - Run "npm run deploy" to publish your worker
+ *
+ * Learn more at https://developers.cloudflare.com/workers/
+ 
+
+export default {
+  async fetch(request, env, ctx) {
+    // You can view your logs in the Observability dashboard
+    console.info({ message: 'Hello World Worker received a request!' }); 
+    return new Response('Hello World!');
+  }
+};
+
+
+*/
+
+export default {
+  async fetch(request) {
+    const SECRET = "nba_sync_2026";
+    const url = new URL(request.url);
+
+    const start = url.searchParams.get("start");
+    const days = url.searchParams.get("days") || "3";
+    const key = url.searchParams.get("key");
+
+    // Debug header pour voir ce qui arrive
+    if (key !== SECRET) {
+      return new Response(
+        JSON.stringify({ error: "invalid key", received: key }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!start) {
+      return new Response(
+        JSON.stringify({ error: "missing start" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const res = await fetch(
+      `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${start}`
+    );
+    const json = await res.json();
+
+    const events = (json.events || []).map(ev => {
+      const comp = ev.competitions?.[0];
+      const home = comp?.competitors?.find(c => c.homeAway === "home");
+      const away = comp?.competitors?.find(c => c.homeAway === "away");
+      return {
+        match_id: ev.id,
+        date: ev.date,
+        team_a: away?.team?.abbreviation,
+        team_b: home?.team?.abbreviation,
+        score: `${away?.score || 0}-${home?.score || 0}`,
+        status: comp?.status?.type?.description
+      };
+    });
+
+    return Response.json({ ok: true, start, days, count: events.length, events });
+  }
+}; 
+
+
+
+

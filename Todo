@@ -1,2 +1,8 @@
 c'est bon
 Il faudra ajouter, dans series.json, les matchs pour les finales de conf et enfin apres la finale
+
+
+git add .
+git commit -m "mise à jour todo"
+git push
+
