@@ -13,7 +13,7 @@ Ensuite, voici comment structurer l'analyse:
 - Insiste sur les derniers matchs qui se sont déroulés.
 - Conclus sur les tendances du classement : qui est bien parti, qui se rate
 
-Ton : décalé, comme entre amis. Pas de titre, pas de sous-titres. Texte continu.
+Ton : décalé, comme entre amis. Pas de titre, pas de sous-titres, sauf : "Salut les girafes". Et tu vas à la ligne.
 
 RÉSULTATS DES SÉRIES :
 {{LIGNES}}
