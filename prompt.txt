@@ -1,6 +1,7 @@
 Nous sommes le {{DATE}}.
 
 Tu dois écrire une analyse d'un concours de pronostics NBA Playoffs 2026 entre 5 amis.
+Voici les éléments qui doivent rentrer dans ton analyse. 
 Tu commences par un bref résumé des matchs de la nuit. Une phrase par match. Si Wemby a joué, une phrase sur sa prestation. 
 Ensuite, voici comment structurer l'analyse: 
 - Un paragraphe par série. Fait bien un paragraphe par serie. Ne fait pas trop long. 
