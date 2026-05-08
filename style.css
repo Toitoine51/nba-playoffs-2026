@@ -1,0 +1,86 @@
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0b0f1a;
+    color: #ffffff;
+}
+
+/* TITRE */
+h1 {
+    text-align: center;
+    padding: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #ffffff;
+}
+
+/* BUTTONS NBA STYLE */
+button {
+    background: #1d428a; /* NBA blue */
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    margin: 4px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s ease;
+}
+
+button:hover {
+    background: #c8102e; /* NBA red */
+    transform: scale(1.03);
+}
+
+/* TAB BAR */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #111827;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* HEADER TABLE */
+th {
+    background: #1d428a;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* CELLS */
+td {
+    padding: 10px;
+    border-bottom: 1px solid #222;
+    text-align: center;
+}
+
+/* MATCH COLUMN */
+td:first-child {
+    text-align: left;
+    font-weight: bold;
+    color: #f9fafb;
+}
+
+/* RAW JSON */
+pre {
+    background: #0f172a;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-x: auto;
+    color: #00ff9d;
+}
+
+/* SCORE HIGHLIGHT */
+td:nth-child(2) {
+    font-weight: bold;
+    color: #fbbf24;
+}
