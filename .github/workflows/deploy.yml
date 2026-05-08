@@ -13,7 +13,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Inject config.js
-        run: echo 'const CONFIG = { API_KEY: "${{ secrets.API_KEY }}" };' > config.js
+        run: |
+          echo "const CONFIG = { API_KEY: \"${{ secrets.API_KEY }}\" };" > config.js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
@@ -28,3 +29,4 @@ jobs:
 
 
 
+          
