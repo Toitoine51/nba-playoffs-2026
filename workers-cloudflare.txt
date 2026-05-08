@@ -323,7 +323,7 @@ if (path === "/article") {
       const targetUrl = new URL("https://scrap.internal");
       targetUrl.searchParams.set("start", currentDate);
       targetUrl.searchParams.set("days", "3");
-      targetUrl.searchParams.set("key", "nba_sync_2026");
+      targetUrl.searchParams.set("key", "macle");
 
       let data;
       try {
