@@ -513,11 +513,7 @@ function App() {
                            </tr>
                         </thead>
                         <tbody>
-                            {[...series].sort((a, b) => {
-                                     const dateA = lastMatchDate(a, mapping) || "";
-                                     const dateB = lastMatchDate(b, mapping) || "";
-                                     return dateB.localeCompare(dateA); // décroissant
-                                 }).map((s, i) => {
+                            {[...series].sort((a, b) => b.id.localeCompare(a.id)).map((s, i) => {
                                 const serieScore = calcSerie(s);
                                 const coeff = coeffTour(s.id);
                                 const scoreAffiche = `${s.team_a} ${serieScore.winsA}-${serieScore.winsB} ${s.team_b}`;
