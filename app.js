@@ -167,6 +167,21 @@ function App() {
         return { winsA, winsB, termine, gagnant, perdant, score };
     };
 
+   const lastMatchDate = (serie) => {
+    const normalize = (abbr) => mapping[abbr] || abbr;
+    const matchs = Object.values(rawMatches).filter(m => {
+        const a = normalize(m.team_a);
+        const b = normalize(m.team_b);
+        return (
+            m.status === "Final" &&
+            ((a === serie.team_a && b === serie.team_b) ||
+             (a === serie.team_b && b === serie.team_a))
+        );
+    });
+    if (matchs.length === 0) return null;
+    return matchs.reduce((max, m) => m.date > max ? m.date : max, matchs[0].date);
+};
+
     const buildPrompt = async (dateMax = null) => {
         const templateRes = await fetch("./prompt.txt?v=" + Date.now());
         const template = await templateRes.text();
@@ -499,14 +514,10 @@ function App() {
                         </thead>
                         <tbody>
                             {[...series].sort((a, b) => {
-                                const scoreA = calcSerie(a);
-                                const scoreB = calcSerie(b);
-                                if (!scoreA.termine && scoreB.termine) return -1;
-                                if (scoreA.termine && !scoreB.termine) return 1;
-                                if (a.id > b.id) return -1;
-                                if (a.id < b.id) return 1;
-                                return 0;
-                            }).map((s, i) => {
+                                     const dateA = lastMatchDate(a) || "";
+                                     const dateB = lastMatchDate(b) || "";
+                                     return dateB.localeCompare(dateA); // décroissant
+                                 }).map((s, i) => {
                                 const serieScore = calcSerie(s);
                                 const coeff = coeffTour(s.id);
                                 const scoreAffiche = `${s.team_a} ${serieScore.winsA}-${serieScore.winsB} ${s.team_b}`;
