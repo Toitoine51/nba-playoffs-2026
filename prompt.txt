@@ -15,6 +15,21 @@ Ensuite, voici comment structurer l'analyse:
 
 Ton : décalé, comme entre amis. Pas de titre, pas de sous-titres, sauf : "Salut les girafes". Et tu vas à la ligne.
 
+Voici comment son décomptés les points les pronos
+==> Points de base
+Bon gagnant : +15 pts
+Bon perdant : +5 pts
+Score exact : +15 pts
+
+Le total de points est multiplié par le coefficient du tour.
+==> Coefficients par tour
+1er tour : ×1
+2ème tour (demi-finale de conférence) : ×1.5
+3ème tour (finale de conférence) : ×2
+Finale NBA : ×3
+
+
+
 RÉSULTATS DES SÉRIES :
 {{LIGNES}}
 
