@@ -86,10 +86,10 @@ function App() {
     const fetchResults = async () => {
         setLoading(true);
         try {
-            await fetch("https://syncnba.toitoine51.workers.dev/", {
+            await fetch("https://nbapronos-sync.toitoine51.workers.dev/", {
                 headers: API_HEADERS
             });
-            const res = await fetch("https://syncnba.toitoine51.workers.dev/state", {
+            const res = await fetch("https://nbapronos-sync.toitoine51.workers.dev/state", {
                 headers: API_HEADERS
             });
             const json = await res.json();
@@ -295,7 +295,7 @@ function App() {
             const hour = new Date().getHours();
 
             if (!forcedDate) {
-                const res = await fetch("https://syncnba.toitoine51.workers.dev/article", {
+                const res = await fetch("https://nbapronos-sync.toitoine51.workers.dev/article", {
                     headers: API_HEADERS
                 });
                 const json = await res.json();
@@ -323,14 +323,14 @@ function App() {
                 setArticleLoading(false);
                 return;
             }
-            const mistralRes = await fetch("https://gemini.toitoine51.workers.dev/", {
+            const mistralRes = await fetch("https://nbapronos-ai.toitoine51.workers.dev/", {
                 method: "POST",
                 headers: API_HEADERS,
                 body: JSON.stringify({ prompt })
             });
             const mistralJson = await mistralRes.json();
             if (mistralJson.ok) {
-                await fetch("https://syncnba.toitoine51.workers.dev/article", {
+                await fetch("https://nbapronos-sync.toitoine51.workers.dev/article", {
                     method: "POST",
                     headers: API_HEADERS,
                     body: JSON.stringify({ text: mistralJson.text, date: targetDate })
@@ -349,7 +349,7 @@ function App() {
 
     const fetchArticlesList = async () => {
         try {
-            const res = await fetch("https://syncnba.toitoine51.workers.dev/articles", {
+            const res = await fetch("https://nbapronos-sync.toitoine51.workers.dev/articles", {
                 headers: API_HEADERS
             });
             const json = await res.json();
