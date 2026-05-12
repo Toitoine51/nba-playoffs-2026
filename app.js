@@ -300,12 +300,14 @@ function App() {
                 });
                 const json = await res.json();
 
-                if (json.text && json.date === targetDate) {
+                const isValid = json.text && json.text.length > 50;
+
+                if (isValid && json.date === targetDate) {
                     setArticle(json.text);
                     setArticleDate(targetDate);
                     setArticleLoading(false);
                     return;
-                } else if (json.text && json.date !== targetDate && hour < 9) {
+                } else if (isValid && json.date !== targetDate && hour < 9) {
                     setArticle(json.text);
                     setArticleDate(json.date);
                     setArticleLoading(false);
