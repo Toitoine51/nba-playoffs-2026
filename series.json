@@ -10,5 +10,7 @@
   { "id": "R2-E1", "conf": "Est", "team_a": "DET", "team_b": "CLE" },
   { "id": "R2-E2", "conf": "Est", "team_a": "NYK", "team_b": "PHI" },
   { "id": "R2-O1", "conf": "Ouest", "team_a": "OKC", "team_b": "LAL" },
-  { "id": "R2-O2", "conf": "Ouest", "team_a": "MIN", "team_b": "SAS" }
+  { "id": "R2-O2", "conf": "Ouest", "team_a": "MIN", "team_b": "SAS" },
+  { "id": "R3-E1", "conf": "Est", "team_a": "NYK", "team_b": "CLE" },
+  { "id": "R3-O1", "conf": "Ouest", "team_a": "SAS", "team_b": "OKC" }
 ]
