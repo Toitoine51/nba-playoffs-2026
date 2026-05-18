@@ -185,6 +185,7 @@ function App() {
     const buildPrompt = async (dateMax = null) => {
         const templateRes = await fetch("./prompt.txt?v=" + Date.now());
         const template = await templateRes.text();
+        const normalize = (abbr) => mapping[abbr] || abbr;
 
         const filteredMatches = dateMax
             ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
@@ -272,7 +273,7 @@ function App() {
             }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
             if (matchs.length === 0) return `${s.id} : pas de match joué`;
-            const lignes = matchs.map((m, i) => `  Match ${i+1} (${m.date}) : ${m.team_a} ${m.score} ${m.team_b}`).join("\n");
+            const lignes = matchs.map((m, i) => `  Match ${i+1} (${m.date}) : ${normalize(m.team_a)} ${m.score} ${normalize(m.team_b)}`).join("\n"); 
             return `${s.id} :\n${lignes}`;
         }).join("\n\n");
 
