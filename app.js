@@ -192,10 +192,7 @@ function App() {
             : rawMatches;
 
         const dateRef = dateMax ? new Date(dateMax) : new Date();
-        const dateMinus2 = new Date(dateRef);
-        dateMinus2.setDate(dateMinus2.getDate() - 1);
-        const dateMin = dateMinus2.toISOString().slice(0, 10);
-
+       
         const seriesActives = series.filter(s => {
             const normalize = (abbr) => mapping[abbr] || abbr;
             return Object.values(filteredMatches).some(m => {
@@ -203,7 +200,7 @@ function App() {
                 const b = normalize(m.team_b);
                 return (
                     m.status === "Final" &&
-                    new Date(m.date).toLocaleDateString("fr-FR").split("/").reverse().join("-") >= dateMin &&
+                    new Date(m.date).toLocaleDateString("fr-FR") === dateRef.toLocaleDateString("fr-FR") &&
                     ((a === s.team_a && b === s.team_b) ||
                      (a === s.team_b && b === s.team_a))
                 );
