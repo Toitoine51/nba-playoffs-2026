@@ -28,7 +28,7 @@ Le total de points est multiplié par le coefficient du tour.
 3ème tour (finale de conférence) : ×2
 Finale NBA : ×3
 
-
+S'il n'y a pas de données pour le RESULTATS DES SERIES ci-dessous, tu dois remplacer la partie analyse par une formule qui indique qu'il n'y a pas eu de match pendant la nuit. Tu n'as pas le droit d'inventer s'il n'y a pas eu de match. 
 
 RÉSULTATS DES SÉRIES :
 {{LIGNES}}
