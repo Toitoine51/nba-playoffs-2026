@@ -12,6 +12,7 @@ Ensuite, voici comment structurer l'analyse:
 - Si on joueur à un prono qui semble mauvais, l'équipe qu'il a choisi va être éliminée, et donc il va être impacté  par une élimination d'une équipe, surtout s'il pense qu'elle va aller loin dans la competition (tu as le détail des pronos de tous les joueurs jusqu'au vainqueur).
 - Insiste sur les derniers matchs qui se sont déroulés.
 - Conclus sur les tendances du classement : qui est bien parti, qui se rate
+- Je t'ai donné aussi les pronos des participants. Tu peux anticiper s'ils sont bien partis (par exemple, si l'équipe d'un pronostiqueur est pronostiquée vainqueur mais elle est déjà éliminé, ce n'est pas bon pour les pronos de ce pronostiqueur)
 
 Ton : décalé, comme entre amis. Pas de titre, pas de sous-titres, sauf : "Salut les girafes". Et tu vas à la ligne.
 
@@ -30,19 +31,14 @@ Finale NBA : ×3
 
 S'il n'y a pas de données pour le RESULTATS DES SERIES ci-dessous, tu dois remplacer la partie analyse par une formule qui indique qu'il n'y a pas eu de match pendant la nuit. Tu n'as pas le droit d'inventer s'il n'y a pas eu de match. 
 
-Voici le mapping pour le nom des franchises.
-{
-  "NY": "NYK",
-  "PHX": "PHO",
-  "SA": "SAS"
-}
+MATCHS JOUÉS DANS LA NUIT:
+{{MATCHS}}
 
 
 RÉSULTATS DES SÉRIES :
 {{LIGNES}}
 
-MATCHS JOUÉS :
-{{MATCHS}}
+
 
 PRONOS DÉTAILLÉS :
 {{PRONOS}}
