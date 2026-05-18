@@ -187,10 +187,10 @@ function App() {
         const template = await templateRes.text();
         const normalize = (abbr) => mapping[abbr] || abbr;
 
-        const filteredMatches = dateMax
-            ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
-            : rawMatches;
-
+       const filteredMatches = dateMax
+          ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date.slice(0, 10) <= dateMax))
+          : rawMatches;
+        
         const dateRef = dateMax ? new Date(dateMax + "T12:00:00") : new Date();
        
         const seriesActives = series.filter(s => {
