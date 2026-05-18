@@ -191,7 +191,7 @@ function App() {
             ? Object.fromEntries(Object.entries(rawMatches).filter(([k, m]) => m.date <= dateMax))
             : rawMatches;
 
-        const dateRef = dateMax ? new Date(dateMax) : new Date();
+        const dateRef = dateMax ? new Date(dateMax + "T12:00:00") : new Date();
        
         const seriesActives = series.filter(s => {
             const normalize = (abbr) => mapping[abbr] || abbr;
