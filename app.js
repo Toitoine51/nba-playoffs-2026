@@ -202,7 +202,7 @@ function App() {
                 const b = normalize(m.team_b);
                 return (
                     m.status === "Final" &&
-                    m.date >= dateMin &&
+                    new Date(m.date).toLocaleDateString("fr-FR").split("/").reverse().join("-") >= dateMin &&
                     ((a === s.team_a && b === s.team_b) ||
                      (a === s.team_b && b === s.team_a))
                 );
