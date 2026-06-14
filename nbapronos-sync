@@ -1,0 +1,139 @@
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Content-Type": "application/json"
+};
+
+export default {
+  async fetch(request, env) {
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST",
+          "Access-Control-Allow-Headers": "Content-Type, x-api-key"
+        }
+      });
+    }
+
+const apiKey = request.headers.get("x-api-key")
+  || new URL(request.url).searchParams.get("key");
+
+// Autorisé si appel depuis le frontend
+const origin = request.headers.get("Origin");
+
+const isFrontend =
+  origin === "https://toitoine51.github.io";
+
+const isInternal =
+  apiKey === env.NBA_KEY;
+
+if (!isFrontend && !isInternal) {
+  return new Response(JSON.stringify({ error: "unauthorized" }), {
+    status: 401,
+    headers: { "Content-Type": "application/json" }
+  });
+}
+
+    const path = new URL(request.url).pathname;
+
+    if (path === "/article") {
+      if (request.method === "POST") {
+        const body = await request.json();
+        const date = body.date || new Date().toISOString().slice(0, 10);
+        await env.NBA_KV.put(`article:${date}`, body.text);
+        return new Response(JSON.stringify({ ok: true }), { headers: corsHeaders });
+      }
+      if (request.method === "GET") {
+        const date = new Date().toISOString().slice(0, 10);
+        const text = await env.NBA_KV.get(`article:${date}`);
+        if (!text) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yDate = yesterday.toISOString().slice(0, 10);
+          const yText = await env.NBA_KV.get(`article:${yDate}`);
+          return new Response(JSON.stringify({ ok: true, text: yText || null, date: yDate }), { headers: corsHeaders });
+        }
+        return new Response(JSON.stringify({ ok: true, text, date }), { headers: corsHeaders });
+      }
+    }
+
+    if (path === "/articles") {
+      const list = await env.NBA_KV.list({ prefix: "article:" });
+      const articles = await Promise.all(
+        list.keys.map(async k => ({
+          date: k.name.replace("article:", ""),
+          text: await env.NBA_KV.get(k.name)
+        }))
+      );
+      return new Response(JSON.stringify({ ok: true, articles }), { headers: corsHeaders });
+    }
+
+    if (path === "/state") {
+      let state = await env.NBA_KV.get("state");
+      state = state ? JSON.parse(state) : { matches: {} };
+      return new Response(JSON.stringify({
+        ok: true,
+        events: Object.values(state.matches || {})
+      }), { headers: corsHeaders });
+    }
+
+    let state = await env.NBA_KV.get("state");
+    state = state ? JSON.parse(state) : { matches: {}, lastDate: "20260418" };
+
+    let matches = state.matches || {};
+    let currentDate = state.lastDate || "20260418";
+
+    const today = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+    let steps = 0;
+    const log = [];
+
+    while (currentDate < today && steps < 120) {
+      const targetUrl = new URL("https://scrap.internal");
+      targetUrl.searchParams.set("start", currentDate);
+      targetUrl.searchParams.set("days", "3");
+      targetUrl.searchParams.set("key", env.NBA_KEY);
+
+      let data;
+      try {
+        const res = await env.SCRAP.fetch(targetUrl.toString());
+        const text = await res.text();
+        data = JSON.parse(text);
+      } catch (e) {
+        return new Response(JSON.stringify({
+          ok: false, error: "fetch/parse failed", detail: e.message, step: steps, currentDate
+        }), { headers: corsHeaders });
+      }
+
+      if (!data.ok || !Array.isArray(data.events)) {
+        return new Response(JSON.stringify({
+          ok: false, error: "scrap invalid", raw: data, currentDate
+        }), { headers: corsHeaders });
+      }
+
+      log.push({ date: currentDate, count: data.events.length });
+
+      for (const ev of data.events) {
+        matches[ev.match_id] = ev;
+      }
+
+      const d = new Date(
+        currentDate.slice(0, 4) + "-" +
+        currentDate.slice(4, 6) + "-" +
+        currentDate.slice(6, 8)
+      );
+      d.setDate(d.getDate() + 1);
+      currentDate = d.toISOString().slice(0, 10).replaceAll("-", "");
+      steps++;
+    }
+
+    await env.NBA_KV.put("state", JSON.stringify({ matches, lastDate: currentDate }));
+
+    return new Response(JSON.stringify({
+      ok: true,
+      matches: Object.keys(matches).length,
+      lastDate: currentDate,
+      log
+    }), { headers: corsHeaders });
+  }
+};
